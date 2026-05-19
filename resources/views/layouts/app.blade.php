@@ -62,13 +62,21 @@
                         <i class="fas fa-bell w-5"></i>
                         <span>Notifikasi</span>
                     </a>
+                    <a href="{{ route('users.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('users.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Manajemen Pengguna</span>
+                    </a>
+                    <a href="{{ route('roles.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('roles.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <i class="fas fa-user-shield w-5"></i>
+                        <span>Manajemen Role</span>
+                    </a>
+                    <a href="{{ route('permissions.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('permissions.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <i class="fas fa-key w-5"></i>
+                        <span>Manajemen Permission</span>
+                    </a>
                     <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-sliders w-5"></i>
                         <span>Pengaturan</span>
-                    </a>
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-users w-5"></i>
-                        <span>Manajemen Pengguna</span>
                     </a>
                 </div>
             </nav>
