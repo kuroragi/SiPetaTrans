@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -12,8 +14,28 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::with('permissions')->paginate(10);
-        return view('roles.index', compact('roles'));
+        $roles = Role::query()
+            ->with('permissions')
+            ->withCount('permissions')
+            ->orderBy('name')
+            ->paginate(10);
+
+        $tableRoleHasPermissions = config('permission.table_names.role_has_permissions', 'role_has_permissions');
+
+        $totalRoles = Role::count();
+        $rolesWithPermissions = Role::has('permissions')->count();
+        $rolesWithoutPermissions = max(0, $totalRoles - $rolesWithPermissions);
+        $totalPermissions = Permission::count();
+        $totalRolePermissionLinks = DB::table($tableRoleHasPermissions)->count();
+
+        return view('roles.index', compact(
+            'roles',
+            'totalRoles',
+            'rolesWithPermissions',
+            'rolesWithoutPermissions',
+            'totalPermissions',
+            'totalRolePermissionLinks'
+        ));
     }
 
     /**

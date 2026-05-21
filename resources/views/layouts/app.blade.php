@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-100">
     <div class="flex h-screen">
         <!-- Sidebar -->
@@ -30,51 +32,58 @@
             <!-- Navigation Menu -->
             <nav class="mt-8 px-4">
                 <div class="space-y-2">
-                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('dashboard') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('dashboard') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('dashboard') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-chart-line w-5"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a href="{{ route('assets.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('assets.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('assets.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('assets.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-map w-5"></i>
                         <span>Peta Aset</span>
                     </a>
-                    <a href="{{ route('asset-types.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-types.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('asset-types.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-types.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-palette w-5"></i>
                         <span>Kelola Kategori</span>
                     </a>
-                    <a href="{{ route('assets.create') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-plus-circle w-5"></i>
-                        <span>Input Aset Baru</span>
-                    </a>
-                    <a href="{{ route('asset-monitoring.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-monitoring.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('asset-monitoring.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-monitoring.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-camera w-5"></i>
                         <span>Monitoring Kondisi</span>
                     </a>
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <a href="#"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-wrench w-5"></i>
                         <span>Pemeliharaan</span>
                     </a>
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <a href="#"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-file-pdf w-5"></i>
                         <span>Laporan</span>
                     </a>
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <a href="#"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-bell w-5"></i>
                         <span>Notifikasi</span>
                     </a>
-                    <a href="{{ route('users.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('users.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('users.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('users.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-users w-5"></i>
                         <span>Manajemen Pengguna</span>
                     </a>
-                    <a href="{{ route('roles.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('roles.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('roles.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('roles.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-user-shield w-5"></i>
                         <span>Manajemen Role</span>
                     </a>
-                    <a href="{{ route('permissions.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('permissions.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                    <a href="{{ route('permissions.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('permissions.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-key w-5"></i>
                         <span>Manajemen Permission</span>
                     </a>
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <a href="#"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-sliders w-5"></i>
                         <span>Pengaturan</span>
                     </a>
@@ -126,4 +135,5 @@
 
     @stack('scripts')
 </body>
+
 </html>
