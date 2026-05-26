@@ -52,6 +52,11 @@
                         <i class="fas fa-camera w-5"></i>
                         <span>Monitoring Kondisi</span>
                     </a>
+                    <a href="{{ route('damage-reports.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('damage-reports.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <i class="fas fa-triangle-exclamation w-5"></i>
+                        <span>Pengaduan Kerusakan</span>
+                    </a>
                     <a href="#"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-wrench w-5"></i>
@@ -116,6 +121,12 @@
                         <button class="p-2 hover:bg-gray-100 rounded-lg transition">
                             <i class="fas fa-bell text-gray-600 text-xl"></i>
                         </button>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Logout">
+                                <i class="fas fa-right-from-bracket text-gray-600 text-xl"></i>
+                            </button>
+                        </form>
                         <div class="h-8 w-px bg-gray-200"></div>
                         <div class="flex items-center space-x-2">
                             <span class="text-sm text-gray-600">{{ date('d M Y H:i') }}</span>

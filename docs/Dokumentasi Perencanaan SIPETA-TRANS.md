@@ -41,7 +41,6 @@ Aplikasi SIPETA-TRANS mencakup beberapa fitur utama yang dapat diakses oleh peng
 - Manajemen pemeliharaan aset
 - Pelaporan kerusakan aset oleh masyarakat dan petugas
 - Pengajuan usulan penambahan fasilitas transportasi
-- Rekap absensi petugas lapangan
 - Penyusunan dan ekspor laporan aset
 
 ### 4. Target Pengguna
@@ -174,11 +173,6 @@ Kebutuhan fungsional berikut mendefinisikan fitur-fitur yang wajib tersedia dala
 - Pengajuan usulan penambahan fasilitas transportasi
 - Verifikasi usulan oleh admin
 - Monitoring status usulan
-
-**Rekap Absensi:**
-- Input absensi petugas lapangan
-- Rekap kehadiran bulanan
-- Ekspor laporan absensi
 
 **Laporan:**
 - Cetak laporan dalam format PDF
@@ -323,10 +317,9 @@ Proses bisnis aplikasi SIPETA-TRANS mencakup interaksi antara petugas lapangan, 
 | 4 | Laporan Pemeliharaan | Riwayat kegiatan dan biaya pemeliharaan aset |
 | 5 | Form Pelaporan Kerusakan | Pelaporan kerusakan aset oleh masyarakat atau petugas |
 | 6 | Form Usulan Penambahan | Pengajuan penambahan aset atau fasilitas transportasi |
-| 7 | Rekap Absensi Petugas | Monitoring kehadiran petugas lapangan |
-| 8 | Laporan Data Aset | Pelaporan aset keseluruhan untuk evaluasi |
-| 9 | Dokumentasi Foto Aset | Bukti visual kondisi aset di lapangan |
-| 10 | Laporan Rekapitulasi | Rekapitulasi data aset untuk pengambilan keputusan |
+| 7 | Laporan Data Aset | Pelaporan aset keseluruhan untuk evaluasi |
+| 8 | Dokumentasi Foto Aset | Bukti visual kondisi aset di lapangan |
+| 9 | Laporan Rekapitulasi | Rekapitulasi data aset untuk pengambilan keputusan |
 
 ---
 
@@ -346,9 +339,6 @@ Pengguna mengakses aplikasi melalui browser modern pada perangkat komputer deskt
 
 **Web Application Server**
 Server aplikasi menggunakan framework Laravel (PHP) yang bertugas menjalankan logika bisnis, memproses permintaan data, mengelola autentikasi pengguna, dan menyediakan antarmuka web.
-
-**Database Server**
-Database MySQL digunakan untuk menyimpan seluruh data sistem meliputi data aset, pengguna, riwayat kondisi, pemeliharaan, laporan kerusakan, usulan, dan absensi.
 
 **Map Service**
 Layanan peta menggunakan LeafletJS yang terintegrasi dengan OpenStreetMap untuk menampilkan lokasi aset secara geografis, marker posisi aset, dan penentuan koordinat aset baru.
@@ -398,11 +388,6 @@ Sistem menggunakan hak akses berbasis peran (role-based access control) dengan r
 - Input dan jadwal pemeliharaan aset
 - Riwayat kegiatan pemeliharaan per aset
 - Monitoring biaya pemeliharaan
-
-**Rekap Absensi**
-- Input absensi petugas lapangan
-- Rekap kehadiran bulanan
-- Ekspor laporan absensi
 
 **Pelaporan Kerusakan**
 - Daftar laporan kerusakan masuk

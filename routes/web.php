@@ -5,9 +5,11 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\AssetMonitoringController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DamageReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\LandingController;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
@@ -17,9 +19,8 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->name('register.post')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-});
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::post('/pengaduan-kerusakan', [DamageReportController::class, 'storePublic'])->name('damage-reports.store-public');
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
@@ -39,6 +40,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/asset-photo/{photo}', [AssetMonitoringController::class, 'deletePhoto'])->name('asset-monitoring.delete-photo');
 
     // Management Routes
+    Route::prefix('damage-reports')->name('damage-reports.')->group(function () {
+        Route::get('/', [DamageReportController::class, 'index'])->name('index');
+        Route::get('/{damageReport}', [DamageReportController::class, 'show'])->name('show');
+        Route::put('/{damageReport}', [DamageReportController::class, 'update'])->name('update');
+    });
+
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
