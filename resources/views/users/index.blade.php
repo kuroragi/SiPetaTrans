@@ -83,12 +83,28 @@
                                     @endforelse
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <a href="#"
-                                    class="inline-flex items-center justify-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-200 bg-blue-600 hover:bg-blue-700 shadow hover:shadow-md">
-                                    <i class="fas fa-eye"></i>
-                                    <span>Detail</span>
-                                </a>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <a href="{{ route('users.show', $user) }}"
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-lg bg-blue-600 hover:bg-blue-700 transition">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
+                                    <a href="{{ route('users.edit', $user) }}"
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-lg bg-yellow-500 hover:bg-yellow-600 transition">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    @if(Auth::id() !== $user->id)
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST"
+                                            onsubmit="return confirm('Hapus pengguna ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="inline-flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-lg bg-red-600 hover:bg-red-700 transition">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

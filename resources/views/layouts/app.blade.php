@@ -138,6 +138,18 @@
             <!-- Page Content -->
             <div class="flex-1 overflow-auto">
                 <div class="p-8">
+                    @if(session('success'))
+                        <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-800 rounded-lg flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-600 text-xl flex-shrink-0"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-800 rounded-lg flex items-center gap-3">
+                            <i class="fas fa-exclamation-circle text-red-600 text-xl flex-shrink-0"></i>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    @endif
                     @yield('content')
                 </div>
             </div>
