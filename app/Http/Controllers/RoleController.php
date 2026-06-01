@@ -9,13 +9,23 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $roles = Role::query()
-            ->with('permissions')
-            ->withCount('permissions')
-            ->orderBy('name')
-            ->paginate(10);
+        $query = Role::query()->with('permissions')->withCount('permissions');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'with_permissions') {
+                $query->has('permissions');
+            } elseif ($request->status === 'without_permissions') {
+                $query->doesntHave('permissions');
+            }
+        }
+
+        $roles = $query->orderBy('name')->paginate(10)->withQueryString();
 
         $tableRoleHasPermissions = config('permission.table_names.role_has_permissions', 'role_has_permissions');
 

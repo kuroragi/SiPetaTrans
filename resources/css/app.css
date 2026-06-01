@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+/* Explicitly include Laravel pagination views so Tailwind v4 generates
+   responsive classes (sm:hidden, sm:flex, sm:flex-1, etc.) used by
+   the Tailwind paginator. Vendor files are gitignored and auto-published
+   views may be untracked, so @source is required in Tailwind v4. */
+@source "../views/vendor/pagination/tailwind.blade.php";
+@source "../views/vendor/pagination/simple-tailwind.blade.php";

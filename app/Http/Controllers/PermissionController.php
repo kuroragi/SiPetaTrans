@@ -9,12 +9,27 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $permissions = Permission::query()
-            ->withCount('roles')
-            ->orderBy('name')
-            ->paginate(10);
+        $query = Permission::query()->withCount('roles');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('guard')) {
+            $query->where('guard_name', $request->guard);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'used') {
+                $query->has('roles');
+            } elseif ($request->status === 'unused') {
+                $query->doesntHave('roles');
+            }
+        }
+
+        $permissions = $query->orderBy('name')->paginate(10)->withQueryString();
 
         $tableRoleHasPermissions = config('permission.table_names.role_has_permissions', 'role_has_permissions');
 
@@ -25,6 +40,7 @@ class PermissionController extends Controller
             ->count('permission_id');
         $permissionsUnassigned = max(0, $totalPermissions - $permissionsAssignedToRoles);
         $totalAssignments = DB::table($tableRoleHasPermissions)->count();
+        $guards = Permission::distinct()->pluck('guard_name');
 
         return view('permissions.index', compact(
             'permissions',
@@ -32,7 +48,8 @@ class PermissionController extends Controller
             'totalRoles',
             'permissionsAssignedToRoles',
             'permissionsUnassigned',
-            'totalAssignments'
+            'totalAssignments',
+            'guards'
         ));
     }
 

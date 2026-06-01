@@ -10,12 +10,30 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::query()
-            ->with('roles')
-            ->orderBy('name')
-            ->paginate(10);
+        $query = User::query()->with('roles');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('role')) {
+            $query->whereHas('roles', fn($q) => $q->where('id', $request->role));
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'with_roles') {
+                $query->has('roles');
+            } elseif ($request->status === 'without_roles') {
+                $query->doesntHave('roles');
+            }
+        }
+
+        $users = $query->orderBy('name')->paginate(10)->withQueryString();
 
         $tableModelHasRoles = config('permission.table_names.model_has_roles', 'model_has_roles');
         $tableRoles = config('permission.table_names.roles', 'roles');
@@ -27,13 +45,15 @@ class UserController extends Controller
             ->count('model_id');
         $usersWithoutRoles = max(0, $totalUsers - $usersWithRoles);
         $totalRoles = DB::table($tableRoles)->count();
+        $allRoles = Role::orderBy('name')->get();
 
         return view('users.index', compact(
             'users',
             'totalUsers',
             'usersWithRoles',
             'usersWithoutRoles',
-            'totalRoles'
+            'totalRoles',
+            'allRoles'
         ));
     }
 

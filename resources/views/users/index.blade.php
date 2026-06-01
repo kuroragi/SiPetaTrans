@@ -43,6 +43,71 @@
             </a>
         </div>
 
+        <!-- Filter Bar -->
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <form method="GET" action="{{ route('users.index') }}">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <!-- Search -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Cari Nama / Email</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                                <i class="fas fa-search text-xs"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Nama atau email pengguna..."
+                                class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Role Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Role</label>
+                        <select name="role" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <option value="">Semua Role</option>
+                            @foreach($allRoles as $role)
+                                <option value="{{ $role->id }}" {{ request('role') == $role->id ? 'selected' : '' }}>
+                                    {{ $role->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Status Role</label>
+                        <select name="status" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            <option value="">Semua Status</option>
+                            <option value="with_roles" {{ request('status') === 'with_roles' ? 'selected' : '' }}>Memiliki Role</option>
+                            <option value="without_roles" {{ request('status') === 'without_roles' ? 'selected' : '' }}>Tanpa Role</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons + Result Info -->
+                <div class="flex items-center justify-between mt-3">
+                    <div class="flex gap-2">
+                        <button type="submit"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-filter"></i> Terapkan Filter
+                        </button>
+                        @if(request()->hasAny(['search', 'role', 'status']))
+                            <a href="{{ route('users.index') }}"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+                                <i class="fas fa-times"></i> Reset
+                            </a>
+                        @endif
+                    </div>
+                    @if(request()->hasAny(['search', 'role', 'status']))
+                        <span class="text-xs text-gray-500">
+                            <span class="font-semibold text-gray-700">{{ $users->total() }}</span> hasil ditemukan
+                            @if(request('search')) untuk &ldquo;<em>{{ request('search') }}</em>&rdquo;@endif
+                        </span>
+                    @endif
+                </div>
+            </form>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50 border-b border-gray-200">
@@ -121,8 +186,13 @@
             </table>
         </div>
 
-        <div class="p-6 border-t border-gray-200">
-            {{ $users->links() }}
+        <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <p class="text-sm text-gray-500">
+                Menampilkan
+                <span class="font-semibold text-gray-700">{{ $users->firstItem() ?? 0 }}&ndash;{{ $users->lastItem() ?? 0 }}</span>
+                dari <span class="font-semibold text-gray-700">{{ $users->total() }}</span> pengguna
+            </p>
+            <div>{{ $users->links() }}</div>
         </div>
     </div>
 @endsection
