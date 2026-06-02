@@ -71,7 +71,7 @@ class UserController extends Controller
             'email'         => ['required', 'email', 'unique:users,email'],
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
             'roles'         => ['nullable', 'array'],
-            'roles.*'       => ['integer', 'exists:roles,id'],
+            'roles.*'       => ['string', 'exists:roles,name'],
         ]);
 
         $user = User::create([
