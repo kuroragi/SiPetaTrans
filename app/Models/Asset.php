@@ -9,13 +9,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Asset extends Model
 {
     protected $fillable = [
+        'registration_number',
         'name',
         'asset_type_id',
+        'asset_sub_type_id',
+        'acquired_at',
+        'acquisition_value',
+        'acquisition_source',
+        'current_value',
         'status',
         'latitude',
         'longitude',
         'location',
         'last_maintenance',
+        'last_maintenance_photo',
         'description',
         'quantity',
     ];
