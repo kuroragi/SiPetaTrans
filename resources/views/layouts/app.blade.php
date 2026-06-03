@@ -37,6 +37,11 @@
                         <i class="fas fa-chart-line w-5"></i>
                         <span>Dashboard</span>
                     </a>
+                    <div
+                        class="my-6 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Aset
+                    </div>
+                    <hr class="my-6 border-gray-200 dark:border-gray-700" />
                     <a href="{{ route('assets.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('assets.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-map w-5"></i>
@@ -47,6 +52,21 @@
                         <i class="fas fa-palette w-5"></i>
                         <span>Kelola Kategori</span>
                     </a>
+                    <a href="#"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-map w-5"></i>
+                        <span>Peta Trayek</span>
+                    </a>
+                    <a href="#"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-camera w-5"></i>
+                        <span>CCTV</span>
+                    </a>
+                    <div
+                        class="my-6 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Laporan
+                    </div>
+                    <hr class="my-6 border-gray-200 dark:border-gray-700" />
                     <a href="{{ route('asset-monitoring.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-monitoring.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-camera w-5"></i>
@@ -72,6 +92,11 @@
                         <i class="fas fa-bell w-5"></i>
                         <span>Notifikasi</span>
                     </a>
+                    <div
+                        class="my-6 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Autentikasi
+                    </div>
+                    <hr class="my-6 border-gray-200 dark:border-gray-700" />
                     <a href="{{ route('users.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('users.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-users w-5"></i>
@@ -138,14 +163,16 @@
             <!-- Page Content -->
             <div class="flex-1 overflow-auto">
                 <div class="p-8">
-                    @if(session('success'))
-                        <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-800 rounded-lg flex items-center gap-3">
+                    @if (session('success'))
+                        <div
+                            class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-800 rounded-lg flex items-center gap-3">
                             <i class="fas fa-check-circle text-green-600 text-xl flex-shrink-0"></i>
                             <span>{{ session('success') }}</span>
                         </div>
                     @endif
-                    @if(session('error'))
-                        <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-800 rounded-lg flex items-center gap-3">
+                    @if (session('error'))
+                        <div
+                            class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-800 rounded-lg flex items-center gap-3">
                             <i class="fas fa-exclamation-circle text-red-600 text-xl flex-shrink-0"></i>
                             <span>{{ session('error') }}</span>
                         </div>

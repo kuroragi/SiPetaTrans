@@ -66,6 +66,7 @@ class DashboardController extends Controller
             'damagedPercentage' => $damagedPercentage,
             'maintenancePercentage' => $maintenancePercentage,
             'assets' => $assets,
+            'assetTypes' => $assetTypes,
             'damagedAssets' => $damagedAssets,
             'assetTypeLabels' => $assetTypeLabels,
             'assetTypeGood' => $assetTypeGood,

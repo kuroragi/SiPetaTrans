@@ -42,4 +42,9 @@ class Asset extends Model
     {
         return $this->hasMany(AssetPhoto::class)->latest('photo_date');
     }
+
+    public function maintenance(): HasMany
+    {
+        return $this->hasMany(AssetMaintenance::class);
+    }
 }

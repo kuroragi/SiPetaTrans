@@ -83,28 +83,52 @@
         <div class="col-span-2 bg-white rounded-lg shadow p-6">
             <div class="mb-4">
                 <h3 class="text-lg font-semibold text-gray-800 mb-3">PETA SEBARAN ASET TRANSPORTASI WILAYAH BUKITTINGGI</h3>
-                <!-- Filter by Asset Type -->
-                <div class="flex gap-2 flex-wrap">
-                    <button
-                        class="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 cursor-pointer filter-btn active"
-                        data-filter="all">
-                        ✓ Semua Aset
+
+                <!-- Map Filter Bar -->
+                <div class="map-filter-bar">
+                    <div class="map-filter-group">
+                        <label class="map-filter-label" for="filterCategory">
+                            <i class="fas fa-layer-group"></i>
+                            Kategori
+                        </label>
+                        <div class="map-select-wrapper">
+                            <select id="filterCategory" class="map-select">
+                                <option value="">Semua Kategori</option>
+                                @foreach ($assetTypes as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                            <i class="fas fa-chevron-down map-select-arrow"></i>
+                        </div>
+                    </div>
+
+                    <div class="map-filter-divider"></div>
+
+                    <div class="map-filter-group">
+                        <label class="map-filter-label" for="filterCondition">
+                            <i class="fas fa-heartbeat"></i>
+                            Kondisi
+                        </label>
+                        <div class="map-select-wrapper">
+                            <select id="filterCondition" class="map-select">
+                                <option value="">Semua Kondisi</option>
+                                <option value="baik">Baik</option>
+                                <option value="perlu_perbaikan">Perlu Perbaikan</option>
+                                <option value="rusak">Rusak</option>
+                                <option value="dalam_pemeliharaan">Dalam Pemeliharaan</option>
+                            </select>
+                            <i class="fas fa-chevron-down map-select-arrow"></i>
+                        </div>
+                    </div>
+
+                    <button id="resetMapFilter" class="map-filter-reset" title="Reset Filter">
+                        <i class="fas fa-rotate-left"></i>
+                        Reset
                     </button>
-                    <button
-                        class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer filter-btn"
-                        data-filter="type" data-type-id="0">
-                        Transportasi
-                    </button>
-                    <button
-                        class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer filter-btn"
-                        data-filter="status" data-status="baik">
-                        Kondisi Baik
-                    </button>
-                    <button
-                        class="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer filter-btn"
-                        data-filter="status" data-status="rusak">
-                        Rusak
-                    </button>
+
+                    <div class="map-filter-badge-wrap">
+                        <span id="markerCount" class="map-marker-badge">0 aset</span>
+                    </div>
                 </div>
             </div>
             <div id="map" style="height: 420px; border-radius: 8px; position: relative;"></div>
@@ -187,6 +211,149 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.Default.css" />
+
+    <style>
+        /* ============================================================
+                                       MAP FILTER BAR
+                                    ============================================================ */
+        .map-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #f0f6ff 0%, #e8f0fe 100%);
+            border: 1px solid #c7d9f8;
+            border-radius: 12px;
+            padding: 10px 16px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+        }
+
+        .map-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .map-filter-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b68a8;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .map-filter-label i {
+            font-size: 11px;
+            color: #6b8cd4;
+        }
+
+        .map-select-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .map-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: #ffffff;
+            border: 1.5px solid #c7d9f8;
+            border-radius: 8px;
+            padding: 6px 32px 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e3a6e;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            min-width: 160px;
+        }
+
+        .map-select:hover {
+            border-color: #6b9cde;
+            background: #f7fbff;
+        }
+
+        .map-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            background: #fff;
+        }
+
+        .map-select-arrow {
+            position: absolute;
+            right: 10px;
+            font-size: 10px;
+            color: #6b8cd4;
+            pointer-events: none;
+            transition: transform 0.2s ease;
+        }
+
+        .map-select:focus~.map-select-arrow {
+            transform: rotate(180deg);
+        }
+
+        .map-filter-divider {
+            width: 1px;
+            height: 32px;
+            background: #c7d9f8;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .map-filter-reset {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #c7d9f8;
+            background: #fff;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .map-filter-reset:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: #fff5f5;
+        }
+
+        .map-filter-reset.active {
+            border-color: #ef4444;
+            color: #ef4444;
+            background: #fff5f5;
+        }
+
+        .map-filter-reset i {
+            font-size: 11px;
+        }
+
+        .map-filter-badge-wrap {
+            margin-left: auto;
+        }
+
+        .map-marker-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+        }
+    </style>
 
     <script>
         // Initialize Map - Fokus pada Bukittinggi
@@ -334,32 +501,46 @@
 
         legend.addTo(map);
 
-        // Filter functionality
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const filterType = this.dataset.filter;
+        // ==================== MAP FILTER (SELECT) ====================
 
-                // Update active button styling
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active',
-                    'bg-blue-100', 'text-blue-700'));
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.add('bg-gray-100',
-                    'text-gray-700'));
-                this.classList.add('active', 'bg-blue-100', 'text-blue-700');
+        function applyMapFilter() {
+            const selectedCategory = document.getElementById('filterCategory').value;
+            const selectedCondition = document.getElementById('filterCondition').value;
 
-                // Filter markers
-                allMarkers.forEach(marker => {
-                    if (filterType === 'all') {
-                        marker.setOpacity(1);
-                    } else if (filterType === 'status') {
-                        const targetStatus = this.dataset.status;
-                        marker.setOpacity(marker.assetData.status === targetStatus ? 1 : 0.2);
-                    } else if (filterType === 'type') {
-                        // Can be expanded for type filtering
-                        marker.setOpacity(1);
-                    }
-                });
+            let visibleCount = 0;
+
+            markerClusterGroup.clearLayers();
+
+            allMarkers.forEach(marker => {
+                const data = marker.assetData;
+
+                const categoryMatch = !selectedCategory || String(data.typeId) === String(selectedCategory);
+                const conditionMatch = !selectedCondition || data.status === selectedCondition;
+
+                if (categoryMatch && conditionMatch) {
+                    markerClusterGroup.addLayer(marker);
+                    visibleCount++;
+                }
             });
+
+            document.getElementById('markerCount').textContent = visibleCount + ' aset';
+
+            // Highlight reset button when filter is active
+            const isFiltered = selectedCategory || selectedCondition;
+            document.getElementById('resetMapFilter').classList.toggle('active', !!isFiltered);
+        }
+
+        document.getElementById('filterCategory').addEventListener('change', applyMapFilter);
+        document.getElementById('filterCondition').addEventListener('change', applyMapFilter);
+
+        document.getElementById('resetMapFilter').addEventListener('click', function() {
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterCondition').value = '';
+            applyMapFilter();
         });
+
+        // Init count
+        applyMapFilter();
 
         // Fit map bounds to markers
         map.fitBounds(markerClusterGroup.getBounds().pad(0.1));

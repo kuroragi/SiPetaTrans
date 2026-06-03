@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AssetMaintenanceController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\AssetMonitoringController;
 use App\Http\Controllers\AuthController;
@@ -49,4 +50,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
+    Route::resource('asset-maintenance', AssetMaintenanceController::class);
 });
