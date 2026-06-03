@@ -323,40 +323,38 @@
                     </div>
                 </div>
 
-                <div class="mb-8 p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border-2 border-gray-200">
-
-                    <div class="flex items-center px-3 py-2 bg-gray-200 rounded-md">
-                        <input type="checkbox" id="is_sub_type_needed" name="is_sub_type_needed"
-                            class="mr-3 w-5 h-5 accent-green-600">
-
-                        <h3 class="font-bold text-gray-800">
-                            Apakah Kategori Ini Memiliki Sub-Kategori?
-                        </h3>
+                <div class="mb-8 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border-2 border-gray-200">
+                    <button type="button"
+                        class="ms-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-3 py-2 rounded-md text-sm font-medium transition-color"
+                        id="addSubtypeButton">Tambah
+                        Sub
+                        Kategori</button>
+                    <div id="subtypesContainer" class="mt-4 space-y-4">
+                        <!-- Subtype fields will be added here dynamically -->
+                        @if ($assetType->subtypes_count == 0)
+                            <p class="text-gray-600 text-sm" id="nullsubtypep">Belum ada sub kategori. Klik "Tambah Sub
+                                Kategori" untuk
+                                menambahkan.</p>
+                        @else
+                            @foreach ($assetType->subtypes as $key => $st)
+                                <div class="p-3 border-2 border-gray-800 w-100 rounded-lg flex gap-3 items-center">
+                                    <input type="hidden" name="subtypes[{{ $key + 1 }}][id]"
+                                        value="{{ $st->id }}">
+                                    <input type="text" name="subtypes[{{ $key + 1 }}][name]"
+                                        class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                        placeholder="Nama Sub Kategori" value="{{ $st->name }}">
+                                    <input type="color" name="subtypes[{{ $key + 1 }}][color]"
+                                        class="w-10 h-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                        value="{{ $st->color }}">
+                                    <button
+                                        class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md text-sm font-medium transition-color"
+                                        type="button" id="removeSubtypeButton" number="{{ $key + 1 }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
-
-                    <!-- Container -->
-                    <div id="subTypeSection" class="hidden mt-5">
-
-                        <div class="p-5 bg-white rounded-lg border border-gray-300 shadow-sm">
-
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="font-semibold text-gray-700">
-                                    Daftar Sub-Kategori
-                                </h4>
-
-                                <button type="button" id="addSubType"
-                                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-
-                                    + Tambah Sub-Kategori
-                                </button>
-                            </div>
-
-                            <div id="subTypeContainer"></div>
-
-                        </div>
-
-                    </div>
-
                 </div>
         </div>
 
@@ -443,83 +441,55 @@
 
     <!-- sub-type script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        let subtypeCount = document.querySelectorAll('#subtypesContainer > div').length;
 
-            const checkbox = document.getElementById('is_sub_type_needed');
-            const section = document.getElementById('subTypeSection');
-            const container = document.getElementById('subTypeContainer');
-            const addButton = document.getElementById('addSubType');
+        document.getElementById('addSubtypeButton').addEventListener('click', () => {
+            subtypeCount++;
+            const container = document.getElementById('subtypesContainer');
 
-            let index = 0;
-
-            checkbox.addEventListener('change', function() {
-                section.classList.toggle('hidden', !this.checked);
-            });
-
-            addButton.addEventListener('click', function() {
-                addSubType();
-            });
-
-            function addSubType() {
-
-                const html = `
-            <div class="sub-type-item p-4 mb-4 bg-gray-50 border rounded-lg">
-
-                <div class="flex justify-between items-center mb-4">
-                    <h5 class="font-medium text-gray-700">
-                        Sub-Kategori #${index + 1}
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="remove-sub-type text-red-600 hover:text-red-800">
-                        Hapus
-                    </button>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-4">
-
-                    <div>
-                        <label class="block mb-1 text-sm font-medium">
-                            Nama Sub-Kategori
-                        </label>
-
-                        <input
-                            type="text"
-                            name="sub_types[${index}][name]"
-                            class="w-full rounded-lg border-gray-300">
-                    </div>
-
-                    <div>
-                        <label class="block mb-1 text-sm font-medium">
-                            Warna
-                        </label>
-
-                        <input
-                            type="color"
-                            name="sub_types[${index}][color]"
-                            value="#22c55e"
-                            class="w-full h-10 rounded-lg">
-                    </div>
-
-                </div>
-
-            </div>
-        `;
-
-                container.insertAdjacentHTML('beforeend', html);
-
-                index++;
+            // Remove "Belum ada sub kategori" message if it exists
+            const nullMessage = document.getElementById('nullsubtypep');
+            if (nullMessage) {
+                nullMessage.remove();
             }
 
-            container.addEventListener('click', function(e) {
+            const subtypeDiv = document.createElement('div');
+            subtypeDiv.classList.add('p-3', 'border-2', 'border-gray-800', 'w-100', 'rounded-lg', 'flex', 'gap-3',
+                'items-center');
 
-                if (e.target.classList.contains('remove-sub-type')) {
-                    e.target.closest('.sub-type-item').remove();
+            subtypeDiv.innerHTML = `
+                <input type="hidden" name="subtypes[${subtypeCount}][id]"
+                                        value="">
+                <input type="text" name="subtypes[${subtypeCount}][name]"
+                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                placeholder="Nama Sub Kategori">
+                            <input type="color" name="subtypes[${subtypeCount}][color]"
+                                class="w-10 h-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" value="#3B82F6">
+                            <button class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md text-sm font-medium transition-color" type="button" id="removeSubtypeButton" number="${subtypeCount}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+            `;
+
+            container.appendChild(subtypeDiv);
+        });
+
+        document.getElementById('subtypesContainer').addEventListener('click', (e) => {
+            if (e.target.closest('#removeSubtypeButton')) {
+                const button = e.target.closest('#removeSubtypeButton');
+                const number = button.getAttribute('number');
+                const subtypeDiv = button.parentElement;
+                subtypeDiv.remove();
+
+                // If no subtypes left, show the null message
+                if (document.querySelectorAll('#subtypesContainer > div').length === 0) {
+                    const nullMessage = document.createElement('p');
+                    nullMessage.id = 'nullsubtypep';
+                    nullMessage.classList.add('text-gray-600', 'text-sm');
+                    nullMessage.textContent =
+                        'Belum ada sub kategori. Klik "Tambah Sub Kategori" untuk menambahkan.';
+                    document.getElementById('subtypesContainer').appendChild(nullMessage);
                 }
-
-            });
-
+            }
         });
     </script>
 @endpush

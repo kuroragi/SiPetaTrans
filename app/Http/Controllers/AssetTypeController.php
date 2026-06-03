@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AssetType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssetTypeController extends Controller
 {
@@ -55,9 +56,22 @@ class AssetTypeController extends Controller
             'icon' => 'required|string|max:50',
             'color' => 'required|regex:/^#[0-9A-F]{6}$/i',
             'description' => 'nullable|string|max:1000',
+            'subtypes' => 'nullable|array'
         ]);
 
-        AssetType::create($validated);
+        DB::transaction(function () use ($validated) {
+            $assetType = AssetType::create($validated);
+
+            if (isset($validated['subtypes'])) {
+
+                foreach ($validated['subtypes'] as $subtypeData) {
+                    $assetType->subtypes()->create([
+                        'name' => $subtypeData['name'],
+                        'color' => $subtypeData['color'],
+                    ]);
+                }
+            }
+        });
 
         return redirect()->route('asset-types.index')
             ->with('success', 'Kategori aset baru berhasil ditambahkan!');
@@ -76,7 +90,7 @@ class AssetTypeController extends Controller
      */
     public function edit(AssetType $assetType)
     {
-        $assetType->loadCount('assets');
+        $assetType->loadCount(['assets', 'subtypes'])->load('subtypes');
         return view('asset-types.edit', ['assetType' => $assetType]);
     }
 
@@ -90,9 +104,34 @@ class AssetTypeController extends Controller
             'icon' => 'nullable|string|max:50',
             'color' => 'nullable|regex:/^#[0-9A-F]{6}$/i',
             'description' => 'nullable|string|max:1000',
+            'subtypes' => 'nullable|array'
         ]);
 
-        $assetType->update($validated);
+        DB::transaction(function () use ($assetType, $validated) {
+            $assetType->update($validated);
+
+            if (isset($validated['subtypes'])) {
+
+                $ids = collect($validated['subtypes'])
+                    ->pluck('id')
+                    ->filter()
+                    ->toArray();
+
+                $assetType->subtypes()
+                    ->whereNotIn('id', $ids)
+                    ->delete();
+
+                foreach ($validated['subtypes'] as $subtypeData) {
+                    $assetType->subtypes()->updateOrCreate(
+                        ['id' => $subtypeData['id']],
+                        [
+                            'name' => $subtypeData['name'],
+                            'color' => $subtypeData['color'],
+                        ]
+                    );
+                }
+            }
+        });
 
         return redirect()->route('asset-types.index')
             ->with('success', 'Kategori aset berhasil diperbarui!');
@@ -109,7 +148,13 @@ class AssetTypeController extends Controller
                 ->with('error', 'Tidak dapat menghapus kategori yang masih memiliki aset terdaftar.');
         }
 
-        $assetType->delete();
+        DB::transaction(function () use ($assetType){
+            // Delete Subtypes
+            $assetType->subtypes()->delete();
+            
+            $assetType->delete();
+        });
+
 
         return redirect()->route('asset-types.index')
             ->with('success', 'Kategori aset berhasil dihapus!');

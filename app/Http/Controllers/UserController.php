@@ -110,7 +110,7 @@ class UserController extends Controller
             'email'         => ['required', 'email', 'unique:users,email,' . $id],
             'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
             'roles'         => ['nullable', 'array'],
-            'roles.*'       => ['integer', 'exists:roles,id'],
+            'roles.*'       => ['string', 'exists:roles,name'],
         ]);
 
         $user->update([
