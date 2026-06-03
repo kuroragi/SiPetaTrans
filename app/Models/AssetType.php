@@ -21,6 +21,6 @@ class AssetType extends Model
 
     public function subtypes(): HasMany
     {
-        return $this->hasMany(AssetSubtype::class);
+        return $this->hasMany(AssetSubType::class);
     }
 }
