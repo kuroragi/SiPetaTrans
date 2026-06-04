@@ -35,10 +35,13 @@
             <thead>
                 <tr class="bg-gray-50 border-b">
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">No</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">No Registrasi</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Nama Aset</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Jenis</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Lokasi</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Nilai Aset</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Cara Perolehan</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Aksi</th>
                 </tr>
             </thead>
@@ -46,8 +49,11 @@
                 @forelse($assets as $key => $asset)
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $key + 1 }}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $asset->registration_number }}</td>
                         <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $asset->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->type->name ?? '-' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            {{ $asset->type->name ?? '-' }}{{ $asset->subtype?->name ? ' - ' . $asset->subtype?->name : '' }}
+                        </td>
                         <td class="px-6 py-4 text-sm">
                             @php
                                 $statusClass = match ($asset->status) {
@@ -63,6 +69,8 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->location ?? '-' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->current_value ?? '0' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->acquisition_source ?? '-' }}</td>
                         <td class="px-6 py-4 text-sm flex gap-2">
                             <a href="{{ route('assets.show', $asset) }}" class="text-blue-600 hover:text-blue-800">
                                 <i class="fas fa-eye"></i>

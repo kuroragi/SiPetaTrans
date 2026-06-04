@@ -14,7 +14,7 @@ class AssetController extends Controller
      */
     public function index()
     {
-        $assets = Asset::with('type')->paginate(15);
+        $assets = Asset::with(['type', 'subtype'])->paginate(15);
         $assetTypes = AssetType::all();
         return view('assets.index', [
             'assets' => $assets,
