@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
@@ -51,4 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::resource('asset-maintenance', AssetMaintenanceController::class);
+
+    Route::prefix('reports')->name('reports')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+    });
 });
