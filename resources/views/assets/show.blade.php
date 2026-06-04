@@ -64,7 +64,8 @@
                 </div>
                 <div class="bg-white bg-opacity-10 rounded-lg p-4">
                     <p class="text-blue-600 text-sm">Tanggal Perolehan</p>
-                    <p class="text-gray-500 text-sm font-mono">{{ date('d-m-Y', strtotime($asset->acquired_at)) ?? '' }}</p>
+                    <p class="text-gray-500 text-sm font-mono">
+                        {{ $asset->acquired_at ? date('d-m-Y', strtotime($asset->acquired_at)) : '' }}</p>
                 </div>
                 <div class="bg-white bg-opacity-10 rounded-lg p-4">
                     <p class="text-blue-600 text-sm">Nilai Perolehan</p>
