@@ -53,7 +53,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('asset-maintenance', AssetMaintenanceController::class);
 
-    Route::prefix('reports')->name('reports')->group(function () {
+    Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::post('/print', [ReportController::class, 'print'])->name('print');
     });
 });

@@ -55,7 +55,9 @@ class AssetController extends Controller
             'last_maintenance_photo' => 'nullable|image',
         ]);
 
-        $validated['last_maintenance_photo'] = $request->file('last_maintenance_photo')->store('assets', 'public');
+        if($request->hasFile('last_maintenance_photo')){
+            $validated['last_maintenance_photo'] = $request->file('last_maintenance_photo')->store('assets', 'public');
+        }
 
         Asset::create($validated);
         return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan');
