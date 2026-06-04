@@ -77,7 +77,8 @@
                         <i class="fas fa-triangle-exclamation w-5"></i>
                         <span>Pengaduan Kerusakan</span>
                     </a>
-                    <a href="{{ route('asset-maintenance.index') }}"
+                    {{-- <a href="{{ route('asset-maintenance.index') }}" --}}
+                    <a href="#"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-wrench w-5"></i>
                         <span>Pemeliharaan</span>
