@@ -8,7 +8,7 @@
     <style>
         /* =====================================================
          * PAPER & PAGE SETUP
-         * F4 / Folio: 215.9mm x 330.2mm  (≈ 8.5in x 13in)
+         * F4 / Folio Landscape: 330.2mm x 215.9mm
          * ===================================================== */
         @media print {
             @page {
@@ -17,8 +17,8 @@
         }
 
         @page {
-            size: 215.9mm 330.2mm;
-            margin: 1.5cm 1.5cm 1.5cm 1.5cm;
+            size: 330.2mm 215.9mm;
+            margin: 1.5cm;
         }
 
         * {
@@ -43,7 +43,7 @@
         }
 
         .kop h4 {
-            font-size: 9px;
+            font-size: 11px;
             font-weight: bold;
             line-height: 1.6;
             text-transform: uppercase;
@@ -58,74 +58,27 @@
 
         /* =====================================================
          * TABLE
-         * Total usable width on F4 with 1.5cm margin each side:
-         * 215.9mm - (2 × 15mm) = 185.9mm  ≈ 527pt / 702px (96dpi)
-         * Column widths below are set in mm to be predictable.
+         * Usable width on F4 Landscape ≈ 300.2mm
+         * Column widths are calculated in percentages to fit 100%
          * ===================================================== */
         table.asset-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            /* enforces fixed column widths */
         }
 
-        /* --- Column widths (total ≈ 185.9mm) --- */
-        col.col-no {
-            width: 6mm;
-        }
-
-        /* No             */
-        col.col-noreg {
-            width: 22mm;
-        }
-
-        /* Nomor Registrasi */
-        col.col-nama {
-            width: 30mm;
-        }
-
-        /* Nama           */
-        col.col-jenis {
-            width: 20mm;
-        }
-
-        /* Jenis          */
-        col.col-subjenis {
-            width: 18mm;
-        }
-
-        /* Sub Jenis      */
-        col.col-status {
-            width: 14mm;
-        }
-
-        /* Status         */
-        col.col-lokasi {
-            width: 22mm;
-        }
-
-        /* Lokasi (fixed) */
-        col.col-jumlah {
-            width: 10mm;
-        }
-
-        /* Jumlah         */
-        col.col-nilai {
-            width: 20mm;
-        }
-
-        /* Nilai Asset    */
-        col.col-perolehan {
-            width: 15mm;
-        }
-
-        /* Cara Perolehan */
-        col.col-tgl {
-            width: 18mm;
-        }
-
-        /* Tgl Perolehan  */
-        /* Total: 6+22+30+20+18+14+22+10+20+15+18 = 195mm (fits F4 185.9mm with slight flex) */
+        /* --- Column widths --- */
+        col.col-no { width: 3%; }
+        col.col-noreg { width: 10%; }
+        col.col-nama { width: 17%; }
+        col.col-jenis { width: 9%; }
+        col.col-subjenis { width: 9%; }
+        col.col-status { width: 7%; }
+        col.col-lokasi { width: 13%; }
+        col.col-jumlah { width: 4%; }
+        col.col-nilai { width: 12%; }
+        col.col-perolehan { width: 8%; }
+        col.col-tgl { width: 8%; }
 
         /* --- Header row --- */
         thead tr th {
@@ -197,7 +150,7 @@
         @media screen {
             body {
                 padding: 20px;
-                background: #ccc;
+                background: #fff;
             }
 
             .page-footer {
