@@ -12,10 +12,35 @@ class AssetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $assets = Asset::with(['type', 'subtype'])->paginate(15);
+        $query = Asset::with(['type', 'subtype']);
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('registration_number', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('asset_type_id', $request->type);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $assets = $query->paginate(15);
         $assetTypes = AssetType::all();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('assets.table_body', compact('assets'))->render(),
+                'pagination' => $assets->links()->toHtml()
+            ]);
+        }
+
         return view('assets.index', [
             'assets' => $assets,
             'assetTypes' => $assetTypes,

@@ -98,21 +98,27 @@
                         Autentikasi
                     </div>
                     <hr class="my-6 border-gray-200 dark:border-gray-700" />
+                    @can('view users')
                     <a href="{{ route('users.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('users.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-users w-5"></i>
                         <span>Manajemen Pengguna</span>
                     </a>
+                    @endcan
+                    @can('view roless')
                     <a href="{{ route('roles.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('roles.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-user-shield w-5"></i>
                         <span>Manajemen Role</span>
                     </a>
+                    @endcan
+                    @can('view roles')
                     <a href="{{ route('permissions.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('permissions.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-key w-5"></i>
                         <span>Manajemen Permission</span>
                     </a>
+                    @endcan
                     <a href="#"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-sliders w-5"></i>

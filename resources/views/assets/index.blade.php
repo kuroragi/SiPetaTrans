@@ -7,15 +7,15 @@
     <!-- Filter and Actions -->
     <div class="mb-6 flex justify-between items-center">
         <div class="flex gap-4 flex-1">
-            <input type="text" placeholder="Cari aset..."
+            <input type="text" id="search-input" placeholder="Cari aset..."
                 class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="type-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Semua Jenis</option>
                 @foreach ($assetTypes as $type)
                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                 @endforeach
             </select>
-            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="status-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Semua Status</option>
                 <option value="baik">Baik</option>
                 <option value="perlu_perbaikan">Perlu Perbaikan</option>
@@ -45,64 +45,87 @@
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200">
-                @forelse($assets as $key => $asset)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $key + 1 }}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $asset->registration_number }}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $asset->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">
-                            {{ $asset->type->name ?? '-' }}{{ $asset->subtype?->name ? ' - ' . $asset->subtype?->name : '' }}
-                        </td>
-                        <td class="px-6 py-4 text-sm">
-                            @php
-                                $statusClass = match ($asset->status) {
-                                    'baik' => 'bg-green-100 text-green-800',
-                                    'perlu_perbaikan' => 'bg-yellow-100 text-yellow-800',
-                                    'rusak' => 'bg-red-100 text-red-800',
-                                    'dalam_pemeliharaan' => 'bg-purple-100 text-purple-800',
-                                    default => 'bg-gray-100 text-gray-800',
-                                };
-                            @endphp
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">
-                                {{ ucfirst(str_replace('_', ' ', $asset->status)) }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->location ?? '-' }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->current_value ?? '0' }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->acquisition_source ?? '-' }}</td>
-                        <td class="px-6 py-4 text-sm flex gap-2">
-                            <a href="{{ route('assets.show', $asset) }}" class="text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ route('assets.edit', $asset) }}" class="text-yellow-600 hover:text-yellow-800">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form action="{{ route('assets.destroy', $asset) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" onclick="return confirm('Yakin ingin menghapus?')"
-                                    class="text-red-600 hover:text-red-800">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                            <i class="fas fa-inbox text-3xl mb-2 opacity-50"></i>
-                            <p>Tidak ada aset ditemukan</p>
-                        </td>
-                    </tr>
-                @endforelse
+            <tbody id="asset-table-body" class="divide-y divide-gray-200">
+                @include('assets.table_body')
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
-    <div class="mt-6">
+    <div id="pagination-container" class="mt-6">
         {{ $assets->links() }}
     </div>
 
+    <!-- AJAX Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('search-input');
+            const typeFilter = document.getElementById('type-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const tableBody = document.getElementById('asset-table-body');
+            const paginationContainer = document.getElementById('pagination-container');
+            
+            let debounceTimer;
+
+            const fetchAssets = function (url = null) {
+                const search = searchInput.value;
+                const type = typeFilter.value;
+                const status = statusFilter.value;
+
+                // Simple loading animation
+                tableBody.style.transition = 'opacity 0.3s ease';
+                tableBody.style.opacity = '0.4';
+
+                const targetUrl = url || '{{ route("assets.index") }}';
+                
+                // Build query string
+                const urlObj = new URL(targetUrl);
+                urlObj.searchParams.set('search', search);
+                urlObj.searchParams.set('type', type);
+                urlObj.searchParams.set('status', status);
+
+                fetch(urlObj, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    tableBody.innerHTML = data.html;
+                    paginationContainer.innerHTML = data.pagination;
+                    tableBody.style.opacity = '1';
+                    
+                    // Attach event listener for new pagination links
+                    attachPaginationListeners();
+                })
+                .catch(error => {
+                    console.error('Error fetching assets:', error);
+                    tableBody.style.opacity = '1';
+                });
+            };
+
+            const attachPaginationListeners = function () {
+                const links = paginationContainer.querySelectorAll('a');
+                links.forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        fetchAssets(this.href);
+                    });
+                });
+            };
+
+            // Event Listeners
+            searchInput.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => fetchAssets(), 400); // 400ms debounce
+            });
+
+            typeFilter.addEventListener('change', () => fetchAssets());
+            statusFilter.addEventListener('change', () => fetchAssets());
+
+            // Initial attachment
+            attachPaginationListeners();
+        });
+    </script>
 @endsection
