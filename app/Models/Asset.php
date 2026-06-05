@@ -52,4 +52,9 @@ class Asset extends Model
     {
         return $this->hasMany(AssetMaintenance::class);
     }
+
+    public function depreciations(): HasMany
+    {
+        return $this->hasMany(AssetDepreciation::class)->orderByDesc('depreciation_date');
+    }
 }

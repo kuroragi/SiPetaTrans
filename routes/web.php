@@ -12,6 +12,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AssetDepreciationController;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
@@ -28,6 +29,15 @@ Route::post('/pengaduan-kerusakan', [DamageReportController::class, 'storePublic
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('assets', AssetController::class);
+    
+    // Asset Depreciation Routes
+    Route::prefix('assets/{asset}/depreciations')->name('asset-depreciations.')->group(function () {
+        Route::get('/', [AssetDepreciationController::class, 'show'])->name('show');
+        Route::post('/', [AssetDepreciationController::class, 'store'])->name('store');
+        Route::put('/{depreciation}', [AssetDepreciationController::class, 'update'])->name('update');
+        Route::delete('/{depreciation}', [AssetDepreciationController::class, 'destroy'])->name('destroy');
+    });
+
     Route::resource('asset-types', AssetTypeController::class);
     Route::put('/asset-types/update-icon', [AssetTypeController::class, 'updateIcon'])->name('asset-types.update-icon');
 

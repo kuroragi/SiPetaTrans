@@ -1,6 +1,7 @@
 @forelse($assets as $key => $asset)
     <tr class="hover:bg-gray-50 transition">
-        <td class="px-6 py-4 text-sm text-gray-700">{{ ($assets->currentPage() - 1) * $assets->perPage() + $key + 1 }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700">{{ ($assets->currentPage() - 1) * $assets->perPage() + $key + 1 }}
+        </td>
         <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $asset->registration_number }}</td>
         <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $asset->name }}</td>
         <td class="px-6 py-4 text-sm text-gray-700">
@@ -26,6 +27,9 @@
         <td class="px-6 py-4 text-sm flex gap-2">
             <a href="{{ route('assets.show', $asset) }}" class="text-blue-600 hover:text-blue-800">
                 <i class="fas fa-eye"></i>
+            </a>
+            <a href="{{ route('asset-depreciations.show', $asset) }}" class="text-yellow-600 hover:text-yellow-800" title="Penyusutan Nilai Asset">
+                <i class="fas fa-angles-down"></i>
             </a>
             <a href="{{ route('assets.edit', $asset) }}" class="text-yellow-600 hover:text-yellow-800">
                 <i class="fas fa-edit"></i>
