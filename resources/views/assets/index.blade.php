@@ -76,7 +76,12 @@
                 tableBody.style.transition = 'opacity 0.3s ease';
                 tableBody.style.opacity = '0.4';
 
-                const targetUrl = url || '{{ route("assets.index") }}';
+                let targetUrl = url || '{{ route("assets.index") }}';
+                
+                // Mencegah error Mixed Content dengan memaksa https jika browser diakses via https
+                if (window.location.protocol === 'https:') {
+                    targetUrl = targetUrl.replace(/^http:\/\//i, 'https://');
+                }
                 
                 // Build query string
                 const urlObj = new URL(targetUrl);
