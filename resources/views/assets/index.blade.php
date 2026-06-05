@@ -9,13 +9,15 @@
         <div class="flex gap-4 flex-1">
             <input type="text" id="search-input" placeholder="Cari aset..."
                 class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <select id="type-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="type-filter"
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Semua Jenis</option>
                 @foreach ($assetTypes as $type)
                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                 @endforeach
             </select>
-            <select id="status-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="status-filter"
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">Semua Status</option>
                 <option value="baik">Baik</option>
                 <option value="perlu_perbaikan">Perlu Perbaikan</option>
@@ -30,7 +32,7 @@
     </div>
 
     <!-- Assets Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
         <table class="w-full">
             <thead>
                 <tr class="bg-gray-50 border-b">
@@ -58,16 +60,16 @@
 
     <!-- AJAX Scripts -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('search-input');
             const typeFilter = document.getElementById('type-filter');
             const statusFilter = document.getElementById('status-filter');
             const tableBody = document.getElementById('asset-table-body');
             const paginationContainer = document.getElementById('pagination-container');
-            
+
             let debounceTimer;
 
-            const fetchAssets = function (url = null) {
+            const fetchAssets = function(url = null) {
                 const search = searchInput.value;
                 const type = typeFilter.value;
                 const status = statusFilter.value;
@@ -76,13 +78,13 @@
                 tableBody.style.transition = 'opacity 0.3s ease';
                 tableBody.style.opacity = '0.4';
 
-                let targetUrl = url || '{{ route("assets.index") }}';
-                
+                let targetUrl = url || '{{ route('assets.index') }}';
+
                 // Mencegah error Mixed Content dengan memaksa https jika browser diakses via https
                 if (window.location.protocol === 'https:') {
                     targetUrl = targetUrl.replace(/^http:\/\//i, 'https://');
                 }
-                
+
                 // Build query string
                 const urlObj = new URL(targetUrl);
                 urlObj.searchParams.set('search', search);
@@ -90,30 +92,30 @@
                 urlObj.searchParams.set('status', status);
 
                 fetch(urlObj, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    tableBody.innerHTML = data.html;
-                    paginationContainer.innerHTML = data.pagination;
-                    tableBody.style.opacity = '1';
-                    
-                    // Attach event listener for new pagination links
-                    attachPaginationListeners();
-                })
-                .catch(error => {
-                    console.error('Error fetching assets:', error);
-                    tableBody.style.opacity = '1';
-                });
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        tableBody.innerHTML = data.html;
+                        paginationContainer.innerHTML = data.pagination;
+                        tableBody.style.opacity = '1';
+
+                        // Attach event listener for new pagination links
+                        attachPaginationListeners();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching assets:', error);
+                        tableBody.style.opacity = '1';
+                    });
             };
 
-            const attachPaginationListeners = function () {
+            const attachPaginationListeners = function() {
                 const links = paginationContainer.querySelectorAll('a');
                 links.forEach(link => {
-                    link.addEventListener('click', function (e) {
+                    link.addEventListener('click', function(e) {
                         e.preventDefault();
                         fetchAssets(this.href);
                     });
@@ -121,7 +123,7 @@
             };
 
             // Event Listeners
-            searchInput.addEventListener('input', function () {
+            searchInput.addEventListener('input', function() {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(() => fetchAssets(), 400); // 400ms debounce
             });
