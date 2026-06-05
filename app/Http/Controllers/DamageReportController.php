@@ -43,6 +43,11 @@ class DamageReportController extends Controller
 
     public function show(DamageReport $damageReport)
     {
+        Mail::to($damageReport->kontak)
+            ->send(new AssetReportMail(
+                'Pengaduan Kerusakan Aset',
+                'Telah diterima pengaduan kerusakan'
+            ));
         $damageReport->load(['asset.type']);
 
         return view('damage-reports.show', [

@@ -13,6 +13,8 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AssetDepreciationController;
+use App\Mail\AssetReportMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
@@ -68,3 +70,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/print', [ReportController::class, 'print'])->name('print');
     });
 });
+
+// Route::get('/send-email-test', function(){
+//     try {
+//         Mail::to('uum1612@gmail.com')
+//             ->queue(new AssetReportMail(
+//                 'Pengaduan Kerusakan Aset',
+//                 'Telah diterima pengaduan kerusakan'
+//             ));
+
+//         dd('Email berhasil dikirim');
+//     } catch (\Exception $e) {
+//         dd($e->getMessage());
+// }
+// });
