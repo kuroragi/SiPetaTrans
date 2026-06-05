@@ -88,7 +88,7 @@ class ReportController extends Controller
             // Format data to match blade expectations
             $assets = $rawAssets->map(function ($row) {
                 return (object)[
-                    'registration_number' => $row->registration_number,
+                    'registration_number' => "'" . $row->registration_number,
                     'name' => $row->asset_name,
                     'type' => (object)['name' => $row->type_name],
                     'subtype' => (object)['name' => $row->subtype_name],
