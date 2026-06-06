@@ -45,177 +45,320 @@
     </div>
 </div>
 
-<div class="grid grid-cols-3 gap-6 mb-6">
-    <!-- Upload Foto Form -->
-    <div class="col-span-1 bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-camera text-blue-500"></i> Unggah Foto Baru
-        </h3>
+<div>
 
-        <form action="{{ route('asset-monitoring.upload', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-
-            <!-- Photo Input -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-images mr-1"></i> Foto (Bisa Multiple)
-                </label>
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition"
-                     id="photo-drop">
-                    <input type="file" name="photos[]" id="photo-input" accept="image/*" class="hidden" required multiple>
-                    <div id="photo-preview" class="hidden space-y-2">
-                        <div id="preview-list" class="grid grid-cols-2 gap-2"></div>
-                        <button type="button" id="clear-photos" class="mt-2 w-full text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 py-1 rounded">Ubah Foto</button>
-                    </div>
-                    <div id="photo-placeholder">
-                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                        <p class="text-sm text-gray-600">Klik atau drag foto di sini</p>
-                        <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF (Max 5MB, Bisa Multiple)</p>
-                    </div>
-                </div>
-                <p id="file-count" class="text-xs text-gray-500 mt-2"></p>
-            </div>
-
-            <!-- Condition -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Kondisi Aset</label>
-                <select name="condition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                    <option value="">-- Pilih Kondisi --</option>
-                    <option value="baik" style="color: #22c55e; font-weight: bold;">✓ Baik</option>
-                    <option value="perlu_perbaikan" style="color: #f59e0b; font-weight: bold;">⚠ Perlu Perbaikan</option>
-                    <option value="rusak" style="color: #ef4444; font-weight: bold;">✗ Rusak</option>
-                    <option value="dalam_pemeliharaan" style="color: #a855f7; font-weight: bold;">⚙ Dalam Pemeliharaan</option>
-                </select>
-            </div>
-
-            <!-- Photo Date -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Foto</label>
-                <input type="date" name="photo_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-
-            <!-- Notes -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
-                <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Deskripsi kondisi atau catatan penting..."></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-green-700 bg-green-600 shadow hover:shadow-md border-none cursor-pointer">
-                <i class="fas fa-upload mr-2"></i>
-                <span>Unggah Foto</span>
+    <div class="border-b border-gray-200">
+        <nav class="flex">
+            <button
+                type="button"
+                class="tab-btn px-6 py-4 border-b-2 border-blue-500 text-blue-600 font-medium"
+                data-tab="monitoring">
+                <i class="fas fa-camera mr-2"></i>
+                Monitoring Kondisi
             </button>
-        </form>
+
+            <button
+                type="button"
+                class="tab-btn px-6 py-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium"
+                data-tab="history">
+                <i class="fas fa-history mr-2"></i>
+                Histori Kegiatan
+            </button>
+        </nav>
     </div>
 
-    <!-- History Timeline -->
-    <div class="col-span-2 bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-images text-blue-500"></i> Album Foto Kondisi
-        </h3>
+    <!-- Monitoring -->
+    <div id="tab-monitoring" class="tab-content">
 
-        @if($photos->count() > 0)
-            <div class="space-y-6 max-h-96 overflow-y-auto">
-                @php
-                    // Group photos by date
-                    $photosByDate = $photos->groupBy(function($photo) {
-                        return $photo->photo_date->format('Y-m-d');
-                    })->sortByDesc(function($group) {
-                        return $group->first()->photo_date;
-                    });
+        <div class="grid grid-cols-3 gap-6 mb-6">
+            <!-- Upload Foto Form -->
+            <div class="col-span-1 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-camera text-blue-500"></i> Unggah Foto Baru
+                </h3>
 
-                    $statusColors = [
-                        'baik' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'fa-check-circle', 'color' => 'text-green-600'],
-                        'perlu_perbaikan' => ['badge' => 'bg-yellow-100 text-yellow-800', 'icon' => 'fa-exclamation-circle', 'color' => 'text-yellow-600'],
-                        'rusak' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'fa-times-circle', 'color' => 'text-red-600'],
-                        'dalam_pemeliharaan' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'fa-hammer', 'color' => 'text-purple-600'],
-                    ];
-                @endphp
+                <form action="{{ route('asset-monitoring.upload', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
 
-                @foreach($photosByDate as $date => $photosGroup)
-                    @php
-                        $firstPhoto = $photosGroup->first();
-                        $condition = $firstPhoto->condition;
-                        $colors = $statusColors[$condition] ?? $statusColors['baik'];
-                    @endphp
+                    <!-- Photo Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-images mr-1"></i> Foto (Bisa Multiple)
+                        </label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition"
+                            id="photo-drop">
+                            <input type="file" name="photos[]" id="photo-input" accept="image/*" class="hidden" required multiple>
+                            <div id="photo-preview" class="hidden space-y-2">
+                                <div id="preview-list" class="grid grid-cols-2 gap-2"></div>
+                                <button type="button" id="clear-photos" class="mt-2 w-full text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 py-1 rounded">Ubah Foto</button>
+                            </div>
+                            <div id="photo-placeholder">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-gray-600">Klik atau drag foto di sini</p>
+                                <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF (Max 5MB, Bisa Multiple)</p>
+                            </div>
+                        </div>
+                        <p id="file-count" class="text-xs text-gray-500 mt-2"></p>
+                    </div>
+
+                    <!-- Condition -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kondisi Aset</label>
+                        <select name="condition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Kondisi --</option>
+                            <option value="baik" style="color: #22c55e; font-weight: bold;">✓ Baik</option>
+                            <option value="perlu_perbaikan" style="color: #f59e0b; font-weight: bold;">⚠ Perlu Perbaikan</option>
+                            <option value="rusak" style="color: #ef4444; font-weight: bold;">✗ Rusak</option>
+                            <option value="dalam_pemeliharaan" style="color: #a855f7; font-weight: bold;">⚙ Dalam Pemeliharaan</option>
+                        </select>
+                    </div>
+
+                    <!-- Photo Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Foto</label>
+                        <input type="date" name="photo_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+
+                    <!-- Notes -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
+                        <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Deskripsi kondisi atau catatan penting..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-green-700 bg-green-600 shadow hover:shadow-md border-none cursor-pointer">
+                        <i class="fas fa-upload mr-2"></i>
+                        <span>Unggah Foto</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- History Timeline -->
+            <div class="col-span-2 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-images text-blue-500"></i> Album Foto Kondisi
+                </h3>
+
+                @if($photos->count() > 0)
+                    <div class="space-y-6 max-h-96 overflow-y-auto">
+                        @php
+                            // Group photos by date
+                            $photosByDate = $photos->groupBy(function($photo) {
+                                return $photo->photo_date->format('Y-m-d');
+                            })->sortByDesc(function($group) {
+                                return $group->first()->photo_date;
+                            });
+
+                            $statusColors = [
+                                'baik' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'fa-check-circle', 'color' => 'text-green-600'],
+                                'perlu_perbaikan' => ['badge' => 'bg-yellow-100 text-yellow-800', 'icon' => 'fa-exclamation-circle', 'color' => 'text-yellow-600'],
+                                'rusak' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'fa-times-circle', 'color' => 'text-red-600'],
+                                'dalam_pemeliharaan' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'fa-hammer', 'color' => 'text-purple-600'],
+                            ];
+                        @endphp
+
+                        @foreach($photosByDate as $date => $photosGroup)
+                            @php
+                                $firstPhoto = $photosGroup->first();
+                                $condition = $firstPhoto->condition;
+                                $colors = $statusColors[$condition] ?? $statusColors['baik'];
+                            @endphp
+                            <div class="border-l-4 border-blue-500 pl-4">
+                                <!-- Date Header -->
+                                <div class="mb-3 pb-2 border-b border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas {{ $colors['icon'] }} {{ $colors['color'] }}"></i>
+                                            <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</span>
+                                            <span class="text-xs text-gray-500">{{ $photosGroup->count() }} foto</span>
+                                        </div>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded {{ $colors['badge'] }}">
+                                            {{ ucfirst(str_replace('_', ' ', $condition)) }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Photo Gallery Grid -->
+                                <div class="grid grid-cols-4 gap-3">
+                                    @forelse($photosGroup as $photo)
+                                        <div class="relative group">
+                                            <img src="{{ asset('storage/' . $photo->photo_path) }}" 
+                                                alt="Photo" 
+                                                class="w-full h-24 object-cover rounded-lg border border-gray-300 cursor-pointer hover:opacity-80 transition"
+                                                data-gallery="true"
+                                                data-gallery-date="{{ $photo->photo_date->format('Y-m-d') }}"
+                                                data-photo-id="{{ $photo->id }}"
+                                                data-photo-path="{{ asset('storage/' . $photo->photo_path) }}"
+                                                data-photo-date="{{ $photo->photo_date->format('d M Y H:i') }}"
+                                                data-photo-condition="{{ ucfirst(str_replace('_', ' ', $photo->condition)) }}"
+                                                data-photo-notes="{{ $photo->notes ?? '' }}"
+                                                data-photo-captured="{{ $photo->captured_by }}"
+                                                onclick="openGallery(event)">
+                                            
+                                            <!-- Hover overlay with actions -->
+                                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                                                <a href="{{ asset('storage/' . $photo->photo_path) }}" target="_blank" 
+                                                class="p-2 bg-white rounded-full hover:bg-gray-100 transition"
+                                                title="Buka full size">
+                                                    <i class="fas fa-eye text-gray-700"></i>
+                                                </a>
+                                                <form action="{{ route('asset-monitoring.delete-photo', $photo) }}" method="POST" class="inline"
+                                                    onsubmit="return confirm('Yakin menghapus foto ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="p-2 bg-white rounded-full hover:bg-red-100 transition"
+                                                            title="Hapus foto">
+                                                        <i class="fas fa-trash text-red-600"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+
+                                            <!-- Photo time indicator -->
+                                            <div class="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded text-center opacity-0 group-hover:opacity-100 transition">
+                                                {{ $photo->photo_date->format('H:i') }}
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <p class="text-gray-500 text-sm col-span-4">Tidak ada foto</p>
+                                    @endforelse
+                                </div>
+
+                                <!-- Notes if exists -->
+                                @if($firstPhoto->notes)
+                                    <p class="text-xs text-gray-600 italic mt-2 p-2 bg-gray-50 rounded">
+                                        <i class="fas fa-sticky-note mr-1"></i> {{ $firstPhoto->notes }}
+                                    </p>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-inbox text-4xl opacity-30 mb-2"></i>
+                        <p>Belum ada foto untuk aset ini</p>
+                        <p class="text-sm">Mulai dokumentasi dengan mengunggah foto di samping</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+    </div>
+
+    <!-- History -->
+    <div id="tab-history" class="tab-content hidden">
+
+        <div class="grid grid-cols-3 gap-6 mb-6">
+            <!-- Form Pemeliharaan -->
+            <div class="col-span-1 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-wrench text-blue-500"></i> Buat Data Pemeliharaan
+                </h3>
+
+                <form action="#" method="POST" class="space-y-4">
+                    <!-- Tipe Pemeliharaan -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Pemeliharaan</label>
+                        <select name="maintenance_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Tipe --</option>
+                            <option value="rutin">Rutin</option>
+                            <option value="perbaikan">Perbaikan Kerusakan</option>
+                        </select>
+                    </div>
+
+                    <!-- Status Pemeliharaan -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status Pemeliharaan</label>
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="sedang_berjalan">Sedang Berjalan</option>
+                            <option value="selesai">Selesai</option>
+                        </select>
+                    </div>
+
+                    <!-- Tanggal Mulai -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
+                        <input type="date" name="start_date" value="2023-11-01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+
+                    <!-- Tanggal Selesai -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi / Tanggal Selesai</label>
+                        <input type="date" name="end_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <!-- Biaya -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
+                        <input type="number" name="cost" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="0">
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Tindakan</label>
+                        <textarea name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Jelaskan tindakan pemeliharaan..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-green-700 bg-green-600 shadow hover:shadow-md border-none cursor-pointer">
+                        <i class="fas fa-save mr-2"></i>
+                        <span>Simpan Pemeliharaan</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Riwayat Timeline -->
+            <div class="col-span-2 bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-history text-blue-500"></i> Riwayat Pemeliharaan
+                </h3>
+                
+                <div class="space-y-6 max-h-96 overflow-y-auto">
                     <div class="border-l-4 border-blue-500 pl-4">
                         <!-- Date Header -->
                         <div class="mb-3 pb-2 border-b border-gray-200">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
-                                    <i class="fas {{ $colors['icon'] }} {{ $colors['color'] }}"></i>
-                                    <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</span>
-                                    <span class="text-xs text-gray-500">{{ $photosGroup->count() }} foto</span>
+                                    <i class="fas fa-tools text-blue-600"></i>
+                                    <span class="font-semibold text-gray-800">15 Jan 2023</span>
                                 </div>
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded {{ $colors['badge'] }}">
-                                    {{ ucfirst(str_replace('_', ' ', $condition)) }}
+                                <span class="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800">
+                                    Rutin - Selesai
                                 </span>
                             </div>
                         </div>
-
-                        <!-- Photo Gallery Grid -->
-                        <div class="grid grid-cols-4 gap-3">
-                            @forelse($photosGroup as $photo)
-                                <div class="relative group">
-                                    <img src="{{ asset('storage/' . $photo->photo_path) }}" 
-                                         alt="Photo" 
-                                         class="w-full h-24 object-cover rounded-lg border border-gray-300 cursor-pointer hover:opacity-80 transition"
-                                         data-gallery="true"
-                                         data-gallery-date="{{ $photo->photo_date->format('Y-m-d') }}"
-                                         data-photo-id="{{ $photo->id }}"
-                                         data-photo-path="{{ asset('storage/' . $photo->photo_path) }}"
-                                         data-photo-date="{{ $photo->photo_date->format('d M Y H:i') }}"
-                                         data-photo-condition="{{ ucfirst(str_replace('_', ' ', $photo->condition)) }}"
-                                         data-photo-notes="{{ $photo->notes ?? '' }}"
-                                         data-photo-captured="{{ $photo->captured_by }}"
-                                         onclick="openGallery(event)">
-                                    
-                                    <!-- Hover overlay with actions -->
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                                        <a href="{{ asset('storage/' . $photo->photo_path) }}" target="_blank" 
-                                           class="p-2 bg-white rounded-full hover:bg-gray-100 transition"
-                                           title="Buka full size">
-                                            <i class="fas fa-eye text-gray-700"></i>
-                                        </a>
-                                        <form action="{{ route('asset-monitoring.delete-photo', $photo) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('Yakin menghapus foto ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="p-2 bg-white rounded-full hover:bg-red-100 transition"
-                                                    title="Hapus foto">
-                                                <i class="fas fa-trash text-red-600"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- Photo time indicator -->
-                                    <div class="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded text-center opacity-0 group-hover:opacity-100 transition">
-                                        {{ $photo->photo_date->format('H:i') }}
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-gray-500 text-sm col-span-4">Tidak ada foto</p>
-                            @endforelse
+                        <!-- Content -->
+                        <div class="bg-gray-50 rounded p-3">
+                            <p class="text-sm text-gray-800 font-medium">Pengecatan ulang halte dan perbaikan atap bocor.</p>
+                            <p class="text-xs text-gray-500 mt-1">Biaya: Rp 500.000</p>
                         </div>
-
-                        <!-- Notes if exists -->
-                        @if($firstPhoto->notes)
-                            <p class="text-xs text-gray-600 italic mt-2 p-2 bg-gray-50 rounded">
-                                <i class="fas fa-sticky-note mr-1"></i> {{ $firstPhoto->notes }}
-                            </p>
-                        @endif
                     </div>
-                @endforeach
+                    
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <!-- Date Header -->
+                        <div class="mb-3 pb-2 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-tools text-blue-600"></i>
+                                    <span class="font-semibold text-gray-800">02 Mar 2022</span>
+                                </div>
+                                <span class="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800">
+                                    Perbaikan - Selesai
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Content -->
+                        <div class="bg-gray-50 rounded p-3">
+                            <p class="text-sm text-gray-800 font-medium">Perbaikan kursi tunggu yang patah.</p>
+                            <p class="text-xs text-gray-500 mt-1">Biaya: Rp 200.000</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        @else
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-inbox text-4xl opacity-30 mb-2"></i>
-                <p>Belum ada foto untuk aset ini</p>
-                <p class="text-sm">Mulai dokumentasi dengan mengunggah foto di samping</p>
-            </div>
-        @endif
+        </div>
+
     </div>
+    
 </div>
 
 <!-- Summary Stats -->
@@ -569,6 +712,54 @@
             closeGallery();
         }
     });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+
+        tab.addEventListener('click', () => {
+
+            tabs.forEach(btn => {
+                btn.classList.remove(
+                    'border-blue-500',
+                    'text-blue-600'
+                );
+
+                btn.classList.add(
+                    'border-transparent',
+                    'text-gray-500'
+                );
+            });
+
+            contents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            tab.classList.remove(
+                'border-transparent',
+                'text-gray-500'
+            );
+
+            tab.classList.add(
+                'border-blue-500',
+                'text-blue-600'
+            );
+
+            document
+                .getElementById(`tab-${tab.dataset.tab}`)
+                .classList.remove('hidden');
+
+        });
+
+    });
+
+});
 </script>
 @endpush
 
