@@ -62,7 +62,7 @@
                 class="tab-btn px-6 py-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium"
                 data-tab="history">
                 <i class="fas fa-history mr-2"></i>
-                Histori Kegiatan
+                Histori Pemeliharaan
             </button>
         </nav>
     </div>
@@ -255,7 +255,10 @@
                     <i class="fas fa-wrench text-blue-500"></i> Buat Data Pemeliharaan
                 </h3>
 
-                <form action="#" method="POST" class="space-y-4">
+                <form action="{{ route('asset-maintenance.store') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="asset_id" value="{{ $asset->id }}">
+
                     <!-- Tipe Pemeliharaan -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Pemeliharaan</label>
@@ -278,7 +281,7 @@
                     <!-- Tanggal Mulai -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
-                        <input type="date" name="start_date" value="2023-11-01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <input type="date" name="start_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
 
                     <!-- Tanggal Selesai -->
@@ -314,45 +317,37 @@
                 </h3>
                 
                 <div class="space-y-6 max-h-96 overflow-y-auto">
-                    <div class="border-l-4 border-blue-500 pl-4">
-                        <!-- Date Header -->
-                        <div class="mb-3 pb-2 border-b border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-tools text-blue-600"></i>
-                                    <span class="font-semibold text-gray-800">15 Jan 2023</span>
+                    @forelse($asset->maintenance as $m)
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <!-- Date Header -->
+                            <div class="mb-3 pb-2 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-tools text-blue-600"></i>
+                                        <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($m->start_date)->format('d M Y') }}</span>
+                                    </div>
+                                    <span class="px-2 py-0.5 text-xs font-semibold rounded {{ $m->status === 'selesai' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                        {{ ucfirst($m->maintenance_type) }} - {{ ucfirst(str_replace('_', ' ', $m->status)) }}
+                                    </span>
                                 </div>
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800">
-                                    Rutin - Selesai
-                                </span>
+                            </div>
+                            <!-- Content -->
+                            <div class="bg-gray-50 rounded p-3">
+                                <p class="text-sm text-gray-800 font-medium">{{ $m->description ?? 'Tidak ada deskripsi' }}</p>
+                                @if($m->cost)
+                                    <p class="text-xs text-gray-500 mt-1">Biaya: Rp {{ number_format($m->cost, 0, ',', '.') }}</p>
+                                @endif
+                                @if($m->end_date)
+                                    <p class="text-xs text-gray-500 mt-1">Selesai: {{ \Carbon\Carbon::parse($m->end_date)->format('d M Y') }}</p>
+                                @endif
                             </div>
                         </div>
-                        <!-- Content -->
-                        <div class="bg-gray-50 rounded p-3">
-                            <p class="text-sm text-gray-800 font-medium">Pengecatan ulang halte dan perbaikan atap bocor.</p>
-                            <p class="text-xs text-gray-500 mt-1">Biaya: Rp 500.000</p>
+                    @empty
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-inbox text-4xl opacity-30 mb-2"></i>
+                            <p>Belum ada riwayat pemeliharaan</p>
                         </div>
-                    </div>
-                    
-                    <div class="border-l-4 border-blue-500 pl-4">
-                        <!-- Date Header -->
-                        <div class="mb-3 pb-2 border-b border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-tools text-blue-600"></i>
-                                    <span class="font-semibold text-gray-800">02 Mar 2022</span>
-                                </div>
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-800">
-                                    Perbaikan - Selesai
-                                </span>
-                            </div>
-                        </div>
-                        <!-- Content -->
-                        <div class="bg-gray-50 rounded p-3">
-                            <p class="text-sm text-gray-800 font-medium">Perbaikan kursi tunggu yang patah.</p>
-                            <p class="text-xs text-gray-500 mt-1">Biaya: Rp 200.000</p>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>

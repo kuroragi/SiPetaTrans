@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AssetReportMail;
 use App\Models\Asset;
 use App\Models\DamageReport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 class DamageReportController extends Controller
 {
@@ -35,7 +38,7 @@ class DamageReportController extends Controller
             'reports' => $reports,
             'counts' => [
                 'baru' => DamageReport::where('status', 'baru')->count(),
-                'dalam_proses' => DamageReport::where('status', 'dalam_proses')->count(),
+                'ditindak_lanjuti' => DamageReport::where('status', 'ditindak_lanjuti')->count(),
                 'selesai' => DamageReport::where('status', 'selesai')->count(),
             ],
         ]);
@@ -53,19 +56,38 @@ class DamageReportController extends Controller
         return view('damage-reports.show', [
             'report' => $damageReport,
             'assets' => Asset::orderBy('name')->get(['id', 'name']),
-            'statusOptions' => ['baru', 'dalam_proses', 'selesai'],
+            'statusOptions' => ['baru', 'ditindak_lanjuti', 'selesai'],
         ]);
     }
 
     public function update(Request $request, DamageReport $damageReport)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:baru,dalam_proses,selesai'],
+            'status' => ['required', 'in:baru,ditindak_lanjuti,selesai'],
             'asset_id' => ['nullable', 'integer', 'exists:assets,id'],
         ]);
 
-        $damageReport->update($validated);
+        try {
+            DB::transaction(function () use ($validated, $damageReport, $request) {
+                $oldStatus = $damageReport->status;
+                $damageReport->update($validated);
 
-        return back()->with('success', 'Pengaduan berhasil diperbarui.');
+                // Insert into AssetMonitoring when status changes to 'ditindak_lanjuti'
+                if ($validated['status'] === 'ditindak_lanjuti' && $oldStatus !== 'ditindak_lanjuti' && $damageReport->asset_id) {
+                    \App\Models\AssetMonitoring::create([
+                        'asset_id' => $damageReport->asset_id,
+                        'photo_path' => $damageReport->foto,
+                        'condition' => 'rusak',
+                        'notes' => 'Dari Laporan Kerusakan: ' . $damageReport->keterangan,
+                        'photo_date' => now(),
+                        'captured_by' => $damageReport->nama_pelapor,
+                    ]);
+                }
+            });
+
+            return back()->with('success', 'Pengaduan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->withErrors('Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

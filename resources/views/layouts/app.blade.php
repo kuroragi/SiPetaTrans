@@ -68,14 +68,24 @@
                     </div>
                     <hr class="my-6 border-gray-200 dark:border-gray-700" />
                     <a href="{{ route('asset-monitoring.index') }}"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-monitoring.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
-                        <i class="fas fa-camera w-5"></i>
-                        <span>Monitoring Kondisi</span>
+                        class="flex items-center justify-between px-4 py-3 rounded-lg {{ Route::is('asset-monitoring.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-camera w-5"></i>
+                            <span>Monitoring Kondisi</span>
+                        </div>
+                        @if($damagedAssetsCount > 0)
+                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ $damagedAssetsCount }}</span>
+                        @endif
                     </a>
                     <a href="{{ route('damage-reports.index') }}"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('damage-reports.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
-                        <i class="fas fa-triangle-exclamation w-5"></i>
-                        <span>Pengaduan Kerusakan</span>
+                        class="flex items-center justify-between px-4 py-3 rounded-lg {{ Route::is('damage-reports.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-triangle-exclamation w-5"></i>
+                            <span>Pengaduan Kerusakan</span>
+                        </div>
+                        @if($newDamageReportsCount > 0)
+                            <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ $newDamageReportsCount }}</span>
+                        @endif
                     </a>
                     <a href="{{ route('asset-maintenance.index') }}"
                     {{-- <a href="#" --}}

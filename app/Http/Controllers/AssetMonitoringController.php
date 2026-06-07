@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
-use App\Models\AssetPhoto;
+use App\Models\AssetMonitoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,7 +14,7 @@ class AssetMonitoringController extends Controller
      */
     public function index()
     {
-        $assets = Asset::with(['type', 'photos' => function($query) {
+        $assets = Asset::with(['type', 'monitorings' => function($query) {
             $query->latest('photo_date')->limit(1);
         }])->get();
 
@@ -28,12 +28,14 @@ class AssetMonitoringController extends Controller
      */
     public function show(Asset $asset)
     {
-        $asset->load(['type', 'photos' => function($query) {
+        $asset->load(['type', 'monitorings' => function($query) {
             $query->orderBy('photo_date', 'desc');
+        }, 'maintenance' => function($query) {
+            $query->orderBy('start_date', 'desc');
         }]);
 
         // Get condition history
-        $conditionHistory = $asset->photos->groupBy(function($photo) {
+        $conditionHistory = $asset->monitorings->groupBy(function($photo) {
             return $photo->photo_date->format('Y-m');
         })->map(function($group) {
             return $group->first();
@@ -41,7 +43,7 @@ class AssetMonitoringController extends Controller
 
         return view('asset-monitoring.show', [
             'asset' => $asset,
-            'photos' => $asset->photos,
+            'photos' => $asset->monitorings,
             'conditionHistory' => $conditionHistory,
         ]);
     }
@@ -68,7 +70,7 @@ class AssetMonitoringController extends Controller
                 $photoPath = $photoFile->store('asset-photos', 'public');
 
                 // Create asset photo record for each file
-                AssetPhoto::create([
+                AssetMonitoring::create([
                     'asset_id' => $asset->id,
                     'photo_path' => $photoPath,
                     'condition' => $request->condition,
@@ -94,7 +96,7 @@ class AssetMonitoringController extends Controller
     /**
      * Delete photo
      */
-    public function deletePhoto(AssetPhoto $photo)
+    public function deletePhoto(AssetMonitoring $photo)
     {
         $asset = $photo->asset;
 

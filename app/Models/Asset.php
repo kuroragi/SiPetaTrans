@@ -43,9 +43,9 @@ class Asset extends Model
         return $this->belongsTo(AssetSubType::class, 'asset_sub_type_id');
     }
 
-    public function photos(): HasMany
+    public function monitorings(): HasMany
     {
-        return $this->hasMany(AssetPhoto::class)->latest('photo_date');
+        return $this->hasMany(AssetMonitoring::class)->latest('photo_date');
     }
 
     public function maintenance(): HasMany

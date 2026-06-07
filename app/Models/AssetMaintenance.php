@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['asset_id', 'maintenance_date', 'status_before', 'status_after'])]
+#[Fillable(['asset_id', 'maintenance_type', 'status', 'start_date', 'end_date', 'cost', 'description'])]
 class AssetMaintenance extends Model
 {
     public function asset(): BelongsTo {

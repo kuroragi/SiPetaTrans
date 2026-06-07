@@ -17,20 +17,20 @@
             <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
                 <p class="text-gray-600 text-sm font-medium">Sudah Terdokumentasi</p>
                 <p class="text-3xl font-bold text-gray-800 mt-2">
-                    {{ $assets->filter(fn($a) => $a->photos->count() > 0)->count() }}</p>
+                    {{ $assets->filter(fn($a) => $a->monitorings->count() > 0)->count() }}</p>
             </div>
 
             <!-- Total Photos -->
             <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
                 <p class="text-gray-600 text-sm font-medium">Total Foto</p>
-                <p class="text-3xl font-bold text-gray-800 mt-2">{{ $assets->sum(fn($a) => $a->photos->count()) }}</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2">{{ $assets->sum(fn($a) => $a->monitorings->count()) }}</p>
             </div>
 
             <!-- Not Documented -->
             <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
                 <p class="text-gray-600 text-sm font-medium">Belum Terdokumentasi</p>
                 <p class="text-3xl font-bold text-gray-800 mt-2">
-                    {{ $assets->filter(fn($a) => $a->photos->count() === 0)->count() }}</p>
+                    {{ $assets->filter(fn($a) => $a->monitorings->count() === 0)->count() }}</p>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
                     <tbody class="divide-y divide-gray-200">
                         @forelse($assets as $asset)
                             @php
-                                $latestPhoto = $asset->photos->first();
+                                $latestPhoto = $asset->monitorings->first();
                                 $statusColors = [
                                     'baik' => 'bg-green-100 text-green-800',
                                     'perlu_perbaikan' => 'bg-yellow-100 text-yellow-800',
@@ -109,7 +109,7 @@
                                 <td class="px-6 py-4 text-sm text-gray-600">{{ $asset->location ?? '-' }}</td>
                                 <td class="px-6 py-4 text-sm">
                                     <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
-                                        {{ $asset->photos->count() }} foto
+                                        {{ $asset->monitorings->count() }} foto
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-700">

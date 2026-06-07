@@ -32,7 +32,19 @@ class AssetMaintenanceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'asset_id' => 'required|exists:assets,id',
+            'maintenance_type' => 'required|in:rutin,perbaikan',
+            'status' => 'required|in:sedang_berjalan,selesai',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'cost' => 'nullable|numeric|min:0',
+            'description' => 'nullable|string'
+        ]);
+
+        AssetMaintenance::create($validated);
+
+        return back()->with('success', 'Data pemeliharaan berhasil ditambahkan.');
     }
 
     /**
