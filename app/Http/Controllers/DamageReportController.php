@@ -46,11 +46,18 @@ class DamageReportController extends Controller
 
     public function show(DamageReport $damageReport)
     {
-        Mail::to($damageReport->kontak)
-            ->send(new AssetReportMail(
-                'Pengaduan Kerusakan Aset',
-                'Telah diterima pengaduan kerusakan'
-            ));
+        if($damageReport->seen == false){
+            $damageReport->update([
+                'seen' => true
+            ]);
+
+            Mail::to($damageReport->kontak)
+                ->send(new AssetReportMail(
+                    'Pengaduan Kerusakan Aset',
+                    'Telah diterima pengaduan kerusakan'
+                ));
+        }
+
         $damageReport->load(['asset.type']);
 
         return view('damage-reports.show', [
@@ -70,6 +77,7 @@ class DamageReportController extends Controller
         try {
             DB::transaction(function () use ($validated, $damageReport, $request) {
                 $oldStatus = $damageReport->status;
+                $validated['forwarded_at'] = now();
                 $damageReport->update($validated);
 
                 // Insert into AssetMonitoring when status changes to 'ditindak_lanjuti'

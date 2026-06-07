@@ -76,40 +76,50 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('damage-reports.update', $report) }}" class="space-y-4">
-                    @csrf
-                    @method('PUT')
+                @if(empty($report->forwarded_at))
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Status</label>
-                        <select name="status"
-                            class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                            @foreach ($statusOptions as $status)
-                                <option value="{{ $status }}" @selected(old('status', $report->status) === $status)>
-                                    {{ ucfirst(str_replace('_', ' ', $status)) }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <form method="POST" action="{{ route('damage-reports.update', $report) }}" class="space-y-4">
+                        @csrf
+                        @method('PUT')
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <select name="status"
+                                class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                @foreach ($statusOptions as $status)
+                                    <option value="{{ $status }}" @selected(old('status', $report->status) === $status)>
+                                        {{ ucfirst(str_replace('_', ' ', $status)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Set Aset (opsional)</label>
+                            <select name="asset_id"
+                                class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">- Tidak memilih -</option>
+                                @foreach ($assets as $asset)
+                                    <option value="{{ $asset->id }}" @selected((string) old('asset_id', $report->asset_id) === (string) $asset->id)>
+                                        {{ $asset->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+                            Simpan
+                        </button>
+                    </form>
+
+                @else
+
+                    <div class="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800">
+                        <i class="fas fa-info-circle mr-1"></i> pengaduan telah ditindak lanjuti.
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Set Aset (opsional)</label>
-                        <select name="asset_id"
-                            class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">- Tidak memilih -</option>
-                            @foreach ($assets as $asset)
-                                <option value="{{ $asset->id }}" @selected((string) old('asset_id', $report->asset_id) === (string) $asset->id)>
-                                    {{ $asset->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <button type="submit"
-                        class="w-full px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
-                        Simpan
-                    </button>
-                </form>
+                
+                @endif
 
                 <div class="mt-6">
                     <a href="{{ route('damage-reports.index') }}" class="text-sm text-gray-600 hover:text-gray-800">
