@@ -39,10 +39,46 @@ class AssetMaintenanceController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'cost' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string'
+            'description' => 'nullable|string',
+            'condition_after' => 'nullable|required_if:status,selesai|in:baik,perlu_perbaikan,rusak',
+            'photos.*' => 'image|max:5120'
         ]);
 
-        AssetMaintenance::create($validated);
+        // Additional validation if perbaikan and selesai: photo is required
+        if ($request->maintenance_type === 'perbaikan' && $request->status === 'selesai') {
+            $request->validate([
+                'photos' => 'required|array|min:1'
+            ]);
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $request) {
+            $maintenance = AssetMaintenance::create([
+                'asset_id' => $validated['asset_id'],
+                'maintenance_type' => $validated['maintenance_type'],
+                'status' => $validated['status'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
+                'cost' => $validated['cost'],
+                'description' => $validated['description']
+            ]);
+
+            if ($validated['maintenance_type'] === 'perbaikan' && $validated['status'] === 'selesai') {
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
+                        $path = $photo->store('asset-photos', 'public');
+                        
+                        \App\Models\AssetMonitoring::create([
+                            'asset_id' => $validated['asset_id'],
+                            'photo_path' => $path,
+                            'condition' => $validated['condition_after'],
+                            'notes' => 'Otomatis: Selesai perbaikan kerusakan. (' . $maintenance->description . ')',
+                            'photo_date' => now(),
+                            'captured_by' => auth()->user()->name ?? 'System',
+                        ]);
+                    }
+                }
+            }
+        });
 
         return back()->with('success', 'Data pemeliharaan berhasil ditambahkan.');
     }

@@ -34,17 +34,47 @@ class AssetMonitoringController extends Controller
             $query->orderBy('start_date', 'desc');
         }]);
 
-        // Get condition history
+        // Group photos by date
+        $timeline = collect();
+        $photosByDate = $asset->monitorings->groupBy(function($photo) {
+            return $photo->photo_date->format('Y-m-d');
+        });
+
+        foreach($photosByDate as $date => $photosGroup) {
+            $timeline->push([
+                'type' => 'monitoring',
+                'date' => \Carbon\Carbon::parse($date),
+                'data' => $photosGroup
+            ]);
+        }
+
+        foreach($asset->maintenance as $m) {
+            $timeline->push([
+                'type' => 'maintenance',
+                'date' => \Carbon\Carbon::parse($m->start_date),
+                'data' => $m
+            ]);
+        }
+
+        $timeline = $timeline->sortByDesc('date');
+
+        // Get condition history (monthly summary)
         $conditionHistory = $asset->monitorings->groupBy(function($photo) {
             return $photo->photo_date->format('Y-m');
         })->map(function($group) {
             return $group->first();
         });
 
+        // Check if asset is currently rusak based on latest monitoring
+        $latestPhoto = $asset->monitorings->first();
+        $isRusak = $latestPhoto && $latestPhoto->condition === 'rusak';
+
         return view('asset-monitoring.show', [
             'asset' => $asset,
-            'photos' => $asset->monitorings,
+            'photos' => $asset->monitorings, // still useful for stats
+            'timeline' => $timeline,
             'conditionHistory' => $conditionHistory,
+            'isRusak' => $isRusak
         ]);
     }
 

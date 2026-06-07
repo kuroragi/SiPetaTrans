@@ -80,12 +80,35 @@ class AssetController extends Controller
             'last_maintenance_photo' => 'nullable|image',
         ]);
 
+        $photoPath = null;
         if($request->hasFile('last_maintenance_photo')){
-            $validated['last_maintenance_photo'] = $request->file('last_maintenance_photo')->store('assets', 'public');
+            $photoPath = $request->file('last_maintenance_photo')->store('assets', 'public');
+            $validated['last_maintenance_photo'] = $photoPath;
         }
 
-        Asset::create($validated);
-        return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan');
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $photoPath) {
+                $asset = Asset::create($validated);
+
+                if ($photoPath) {
+                    \App\Models\AssetMonitoring::create([
+                        'asset_id' => $asset->id,
+                        'photo_path' => $photoPath,
+                        'condition' => $validated['status'],
+                        'notes' => 'Inisialisasi aset baru',
+                        'photo_date' => now(),
+                        'captured_by' => auth()->user()->name ?? 'System',
+                    ]);
+                }
+            });
+
+            return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan');
+        } catch (\Exception $e) {
+            if ($photoPath) {
+                Storage::disk('public')->delete($photoPath);
+            }
+            return back()->withInput()->with('error', 'Gagal menambahkan aset: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -47,140 +47,213 @@
 
 <div>
 
-    <div class="border-b border-gray-200">
-        <nav class="flex">
-            <button
-                type="button"
-                class="tab-btn px-6 py-4 border-b-2 border-blue-500 text-blue-600 font-medium"
-                data-tab="monitoring">
-                <i class="fas fa-camera mr-2"></i>
-                Monitoring Kondisi
-            </button>
-
-            <button
-                type="button"
-                class="tab-btn px-6 py-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium"
-                data-tab="history">
-                <i class="fas fa-history mr-2"></i>
-                Histori Pemeliharaan
-            </button>
-        </nav>
+    <!-- Action Header -->
+    <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <h2 class="text-xl font-bold text-gray-800">Timeline & Tindakan</h2>
+        <div>
+            @if(!$isRusak)
+                <button type="button" onclick="document.getElementById('maintenanceModal').classList.remove('hidden')" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-2">
+                    <i class="fas fa-tools"></i> Pemeliharaan Rutin
+                </button>
+            @else
+                <button type="button" disabled class="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed flex items-center gap-2" title="Selesaikan perbaikan terlebih dahulu">
+                    <i class="fas fa-tools"></i> Pemeliharaan Rutin (Terkunci)
+                </button>
+            @endif
+        </div>
     </div>
 
-    <!-- Monitoring -->
-    <div id="tab-monitoring" class="tab-content">
+    <div class="grid grid-cols-3 gap-6 mb-6">
+        <!-- Left Column: Forms -->
+        <div class="col-span-1">
+            @if($isRusak)
+                <!-- Form Perbaikan Kerusakan -->
+                <div class="bg-white rounded-lg shadow p-6 border-t-4 border-red-500">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-wrench text-red-500"></i> Perbaikan Kerusakan
+                    </h3>
+                    <div class="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded border border-red-200">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Aset sedang rusak. Selesaikan perbaikan sebelum dapat melakukan pemeliharaan rutin atau monitoring kondisi kembali.
+                    </div>
 
-        <div class="grid grid-cols-3 gap-6 mb-6">
-            <!-- Upload Foto Form -->
-            <div class="col-span-1 bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-camera text-blue-500"></i> Unggah Foto Baru
-                </h3>
+                    <form action="{{ route('asset-maintenance.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4" id="perbaikanForm">
+                        @csrf
+                        <input type="hidden" name="asset_id" value="{{ $asset->id }}">
+                        <input type="hidden" name="maintenance_type" value="perbaikan">
 
-                <form action="{{ route('asset-monitoring.upload', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    @csrf
+                        <!-- Status Pemeliharaan -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status Perbaikan</label>
+                            <select name="status" id="perbaikanStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="sedang_berjalan">Sedang Berjalan</option>
+                                <option value="selesai">Selesai</option>
+                            </select>
+                        </div>
 
-                    <!-- Photo Input -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-images mr-1"></i> Foto (Bisa Multiple)
-                        </label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition"
-                            id="photo-drop">
-                            <input type="file" name="photos[]" id="photo-input" accept="image/*" class="hidden" required multiple>
-                            <div id="photo-preview" class="hidden space-y-2">
-                                <div id="preview-list" class="grid grid-cols-2 gap-2"></div>
-                                <button type="button" id="clear-photos" class="mt-2 w-full text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 py-1 rounded">Ubah Foto</button>
+                        <!-- Fields for Selesai -->
+                        <div id="selesaiFields" class="hidden space-y-4 p-4 bg-gray-50 border border-gray-200 rounded-lg mt-2">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-2"><i class="fas fa-check-circle text-green-500 mr-1"></i> Data Penyelesaian</h4>
+                            
+                            <!-- Condition After -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Kondisi Setelah Perbaikan</label>
+                                <select name="condition_after" id="conditionAfter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">-- Pilih Kondisi --</option>
+                                    <option value="baik" style="color: #22c55e; font-weight: bold;">✓ Baik</option>
+                                    <option value="perlu_perbaikan" style="color: #f59e0b; font-weight: bold;">⚠ Perlu Perbaikan (Belum Tuntas)</option>
+                                    <option value="rusak" style="color: #ef4444; font-weight: bold;">✗ Rusak (Tidak Bisa Diperbaiki)</option>
+                                </select>
                             </div>
-                            <div id="photo-placeholder">
-                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                                <p class="text-sm text-gray-600">Klik atau drag foto di sini</p>
-                                <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF (Max 5MB, Bisa Multiple)</p>
+
+                            <!-- Photo Input -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-camera mr-1"></i> Foto Bukti Penyelesaian (Bisa Multiple)
+                                </label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition" id="perbaikan-photo-drop">
+                                    <input type="file" name="photos[]" id="perbaikan-photo-input" accept="image/*" class="hidden" multiple>
+                                    <div id="perbaikan-photo-preview" class="hidden space-y-2">
+                                        <div id="perbaikan-preview-list" class="grid grid-cols-2 gap-2"></div>
+                                        <button type="button" id="perbaikan-clear-photos" class="mt-2 w-full text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 py-1 rounded">Ubah Foto</button>
+                                    </div>
+                                    <div id="perbaikan-photo-placeholder">
+                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                        <p class="text-sm text-gray-600">Klik atau drag foto di sini</p>
+                                        <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF (Max 5MB)</p>
+                                    </div>
+                                </div>
+                                <p id="perbaikan-file-count" class="text-xs text-gray-500 mt-2"></p>
+                                <p class="text-xs text-red-500 mt-1 italic">* Wajib melampirkan foto saat perbaikan selesai</p>
                             </div>
                         </div>
-                        <p id="file-count" class="text-xs text-gray-500 mt-2"></p>
-                    </div>
 
-                    <!-- Condition -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Kondisi Aset</label>
-                        <select name="condition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">-- Pilih Kondisi --</option>
-                            <option value="baik" style="color: #22c55e; font-weight: bold;">✓ Baik</option>
-                            <option value="perlu_perbaikan" style="color: #f59e0b; font-weight: bold;">⚠ Perlu Perbaikan</option>
-                            <option value="rusak" style="color: #ef4444; font-weight: bold;">✗ Rusak</option>
-                            <option value="dalam_pemeliharaan" style="color: #a855f7; font-weight: bold;">⚙ Dalam Pemeliharaan</option>
-                        </select>
-                    </div>
+                        <!-- Tanggal Mulai -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
+                            <input type="date" name="start_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
 
-                    <!-- Photo Date -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Foto</label>
-                        <input type="date" name="photo_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                    </div>
+                        <!-- Tanggal Selesai -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi / Tanggal Selesai</label>
+                            <input type="date" name="end_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <!-- Biaya -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
+                            <input type="number" name="cost" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="0">
+                        </div>
 
-                    <!-- Notes -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
-                        <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Deskripsi kondisi atau catatan penting..."></textarea>
-                    </div>
+                        <!-- Deskripsi -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Tindakan</label>
+                            <textarea name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Jelaskan tindakan perbaikan yang dilakukan..." required></textarea>
+                        </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-green-700 bg-green-600 shadow hover:shadow-md border-none cursor-pointer">
-                        <i class="fas fa-upload mr-2"></i>
-                        <span>Unggah Foto</span>
-                    </button>
-                </form>
-            </div>
+                        <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-red-700 bg-red-600 shadow hover:shadow-md border-none cursor-pointer">
+                            <i class="fas fa-save mr-2"></i> Simpan Perbaikan
+                        </button>
+                    </form>
+                </div>
+            @else
+                <!-- Form Unggah Foto Baru -->
+                <div class="bg-white rounded-lg shadow p-6 border-t-4 border-blue-500">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-camera text-blue-500"></i> Unggah Foto Baru
+                    </h3>
 
-            <!-- History Timeline -->
-            <div class="col-span-2 bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-images text-blue-500"></i> Album Foto Kondisi
-                </h3>
+                    <form action="{{ route('asset-monitoring.upload', $asset) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <!-- Photo Input -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-images mr-1"></i> Foto (Bisa Multiple)
+                            </label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition" id="photo-drop">
+                                <input type="file" name="photos[]" id="photo-input" accept="image/*" class="hidden" required multiple>
+                                <div id="photo-preview" class="hidden space-y-2">
+                                    <div id="preview-list" class="grid grid-cols-2 gap-2"></div>
+                                    <button type="button" id="clear-photos" class="mt-2 w-full text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 py-1 rounded">Ubah Foto</button>
+                                </div>
+                                <div id="photo-placeholder">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Klik atau drag foto di sini</p>
+                                    <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF (Max 5MB)</p>
+                                </div>
+                            </div>
+                            <p id="file-count" class="text-xs text-gray-500 mt-2"></p>
+                        </div>
 
-                @if($photos->count() > 0)
-                    <div class="space-y-6 max-h-96 overflow-y-auto">
-                        @php
-                            // Group photos by date
-                            $photosByDate = $photos->groupBy(function($photo) {
-                                return $photo->photo_date->format('Y-m-d');
-                            })->sortByDesc(function($group) {
-                                return $group->first()->photo_date;
-                            });
+                        <!-- Condition -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kondisi Aset</label>
+                            <select name="condition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="">-- Pilih Kondisi --</option>
+                                <option value="baik" style="color: #22c55e; font-weight: bold;">✓ Baik</option>
+                                <option value="perlu_perbaikan" style="color: #f59e0b; font-weight: bold;">⚠ Perlu Perbaikan</option>
+                                <option value="rusak" style="color: #ef4444; font-weight: bold;">✗ Rusak</option>
+                                <option value="dalam_pemeliharaan" style="color: #a855f7; font-weight: bold;">⚙ Dalam Pemeliharaan</option>
+                            </select>
+                        </div>
 
-                            $statusColors = [
-                                'baik' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'fa-check-circle', 'color' => 'text-green-600'],
-                                'perlu_perbaikan' => ['badge' => 'bg-yellow-100 text-yellow-800', 'icon' => 'fa-exclamation-circle', 'color' => 'text-yellow-600'],
-                                'rusak' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'fa-times-circle', 'color' => 'text-red-600'],
-                                'dalam_pemeliharaan' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'fa-hammer', 'color' => 'text-purple-600'],
-                            ];
-                        @endphp
+                        <!-- Photo Date -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Foto</label>
+                            <input type="date" name="photo_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
 
-                        @foreach($photosByDate as $date => $photosGroup)
+                        <!-- Notes -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
+                            <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Deskripsi kondisi atau catatan penting..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-blue-700 bg-blue-600 shadow hover:shadow-md border-none cursor-pointer">
+                            <i class="fas fa-upload mr-2"></i> Unggah Foto
+                        </button>
+                    </form>
+                </div>
+            @endif
+        </div>
+
+        <!-- Right Column: Unified Timeline -->
+        <div class="col-span-2 bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-stream text-blue-500"></i> Histori Kegiatan (Monitoring & Pemeliharaan)
+            </h3>
+
+            @if($timeline->count() > 0)
+                <div class="space-y-6 max-h-[800px] overflow-y-auto pr-2">
+                    @foreach($timeline as $item)
+                        @if($item['type'] === 'monitoring')
                             @php
+                                $photosGroup = $item['data'];
                                 $firstPhoto = $photosGroup->first();
                                 $condition = $firstPhoto->condition;
+                                $statusColors = [
+                                    'baik' => ['badge' => 'bg-green-100 text-green-800', 'icon' => 'fa-check-circle', 'color' => 'text-green-600'],
+                                    'perlu_perbaikan' => ['badge' => 'bg-yellow-100 text-yellow-800', 'icon' => 'fa-exclamation-circle', 'color' => 'text-yellow-600'],
+                                    'rusak' => ['badge' => 'bg-red-100 text-red-800', 'icon' => 'fa-times-circle', 'color' => 'text-red-600'],
+                                    'dalam_pemeliharaan' => ['badge' => 'bg-purple-100 text-purple-800', 'icon' => 'fa-hammer', 'color' => 'text-purple-600'],
+                                ];
                                 $colors = $statusColors[$condition] ?? $statusColors['baik'];
                             @endphp
-                            <div class="border-l-4 border-blue-500 pl-4">
-                                <!-- Date Header -->
+                            <div class="border-l-4 border-blue-400 pl-4">
                                 <div class="mb-3 pb-2 border-b border-gray-200">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
-                                            <i class="fas {{ $colors['icon'] }} {{ $colors['color'] }}"></i>
-                                            <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($date)->format('d M Y') }}</span>
+                                            <i class="fas fa-camera text-blue-500"></i>
+                                            <span class="font-semibold text-gray-800">{{ $item['date']->format('d M Y') }}</span>
                                             <span class="text-xs text-gray-500">{{ $photosGroup->count() }} foto</span>
                                         </div>
                                         <span class="px-2 py-0.5 text-xs font-semibold rounded {{ $colors['badge'] }}">
-                                            {{ ucfirst(str_replace('_', ' ', $condition)) }}
+                                            Monitoring: {{ ucfirst(str_replace('_', ' ', $condition)) }}
                                         </span>
                                     </div>
                                 </div>
-
-                                <!-- Photo Gallery Grid -->
                                 <div class="grid grid-cols-4 gap-3">
-                                    @forelse($photosGroup as $photo)
+                                    @foreach($photosGroup as $photo)
                                         <div class="relative group">
                                             <img src="{{ asset('storage/' . $photo->photo_path) }}" 
                                                 alt="Photo" 
@@ -194,164 +267,54 @@
                                                 data-photo-notes="{{ $photo->notes ?? '' }}"
                                                 data-photo-captured="{{ $photo->captured_by }}"
                                                 onclick="openGallery(event)">
-                                            
-                                            <!-- Hover overlay with actions -->
                                             <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-lg transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                                                <a href="{{ asset('storage/' . $photo->photo_path) }}" target="_blank" 
-                                                class="p-2 bg-white rounded-full hover:bg-gray-100 transition"
-                                                title="Buka full size">
-                                                    <i class="fas fa-eye text-gray-700"></i>
-                                                </a>
-                                                <form action="{{ route('asset-monitoring.delete-photo', $photo) }}" method="POST" class="inline"
-                                                    onsubmit="return confirm('Yakin menghapus foto ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" 
-                                                            class="p-2 bg-white rounded-full hover:bg-red-100 transition"
-                                                            title="Hapus foto">
-                                                        <i class="fas fa-trash text-red-600"></i>
-                                                    </button>
+                                                <a href="{{ asset('storage/' . $photo->photo_path) }}" target="_blank" class="p-2 bg-white rounded-full hover:bg-gray-100 transition" title="Buka full size"><i class="fas fa-eye text-gray-700"></i></a>
+                                                <form action="{{ route('asset-monitoring.delete-photo', $photo) }}" method="POST" class="inline" onsubmit="return confirm('Yakin menghapus foto ini?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="p-2 bg-white rounded-full hover:bg-red-100 transition" title="Hapus foto"><i class="fas fa-trash text-red-600"></i></button>
                                                 </form>
                                             </div>
-
-                                            <!-- Photo time indicator -->
-                                            <div class="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded text-center opacity-0 group-hover:opacity-100 transition">
-                                                {{ $photo->photo_date->format('H:i') }}
-                                            </div>
                                         </div>
-                                    @empty
-                                        <p class="text-gray-500 text-sm col-span-4">Tidak ada foto</p>
-                                    @endforelse
+                                    @endforeach
                                 </div>
-
-                                <!-- Notes if exists -->
                                 @if($firstPhoto->notes)
-                                    <p class="text-xs text-gray-600 italic mt-2 p-2 bg-gray-50 rounded">
-                                        <i class="fas fa-sticky-note mr-1"></i> {{ $firstPhoto->notes }}
-                                    </p>
+                                    <p class="text-xs text-gray-600 italic mt-2 p-2 bg-gray-50 rounded"><i class="fas fa-sticky-note mr-1"></i> {{ $firstPhoto->notes }}</p>
                                 @endif
                             </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-inbox text-4xl opacity-30 mb-2"></i>
-                        <p>Belum ada foto untuk aset ini</p>
-                        <p class="text-sm">Mulai dokumentasi dengan mengunggah foto di samping</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-    </div>
-
-    <!-- History -->
-    <div id="tab-history" class="tab-content hidden">
-
-        <div class="grid grid-cols-3 gap-6 mb-6">
-            <!-- Form Pemeliharaan -->
-            <div class="col-span-1 bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-wrench text-blue-500"></i> Buat Data Pemeliharaan
-                </h3>
-
-                <form action="{{ route('asset-maintenance.store') }}" method="POST" class="space-y-4">
-                    @csrf
-                    <input type="hidden" name="asset_id" value="{{ $asset->id }}">
-
-                    <!-- Tipe Pemeliharaan -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Pemeliharaan</label>
-                        <select name="maintenance_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">-- Pilih Tipe --</option>
-                            <option value="rutin">Rutin</option>
-                            <option value="perbaikan">Perbaikan Kerusakan</option>
-                        </select>
-                    </div>
-
-                    <!-- Status Pemeliharaan -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Status Pemeliharaan</label>
-                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="sedang_berjalan">Sedang Berjalan</option>
-                            <option value="selesai">Selesai</option>
-                        </select>
-                    </div>
-
-                    <!-- Tanggal Mulai -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
-                        <input type="date" name="start_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                    </div>
-
-                    <!-- Tanggal Selesai -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi / Tanggal Selesai</label>
-                        <input type="date" name="end_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    
-                    <!-- Biaya -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
-                        <input type="number" name="cost" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="0">
-                    </div>
-
-                    <!-- Deskripsi -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Tindakan</label>
-                        <textarea name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Jelaskan tindakan pemeliharaan..."></textarea>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" class="w-full px-4 py-2.5 text-white font-medium rounded-lg transition-all duration-200 hover:bg-green-700 bg-green-600 shadow hover:shadow-md border-none cursor-pointer">
-                        <i class="fas fa-save mr-2"></i>
-                        <span>Simpan Pemeliharaan</span>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Riwayat Timeline -->
-            <div class="col-span-2 bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-history text-blue-500"></i> Riwayat Pemeliharaan
-                </h3>
-                
-                <div class="space-y-6 max-h-96 overflow-y-auto">
-                    @forelse($asset->maintenance as $m)
-                        <div class="border-l-4 border-blue-500 pl-4">
-                            <!-- Date Header -->
-                            <div class="mb-3 pb-2 border-b border-gray-200">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <i class="fas fa-tools text-blue-600"></i>
-                                        <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($m->start_date)->format('d M Y') }}</span>
+                        @else
+                            @php $m = $item['data']; @endphp
+                            <div class="border-l-4 {{ $m->maintenance_type == 'perbaikan' ? 'border-red-500' : 'border-green-500' }} pl-4 bg-gray-50 rounded-r p-3">
+                                <div class="mb-2 pb-2 border-b border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas {{ $m->maintenance_type == 'perbaikan' ? 'fa-wrench text-red-500' : 'fa-tools text-green-500' }}"></i>
+                                            <span class="font-semibold text-gray-800">{{ $item['date']->format('d M Y') }}</span>
+                                        </div>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded {{ $m->status === 'selesai' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                            {{ ucfirst($m->maintenance_type) }} - {{ ucfirst(str_replace('_', ' ', $m->status)) }}
+                                        </span>
                                     </div>
-                                    <span class="px-2 py-0.5 text-xs font-semibold rounded {{ $m->status === 'selesai' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                        {{ ucfirst($m->maintenance_type) }} - {{ ucfirst(str_replace('_', ' ', $m->status)) }}
-                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-800 font-medium">{{ $m->description ?? 'Tidak ada deskripsi' }}</p>
+                                <div class="flex gap-4 mt-2">
+                                    @if($m->cost)
+                                        <p class="text-xs text-gray-500"><i class="fas fa-money-bill-wave mr-1"></i> Rp {{ number_format($m->cost, 0, ',', '.') }}</p>
+                                    @endif
+                                    @if($m->end_date)
+                                        <p class="text-xs text-gray-500"><i class="fas fa-calendar-check mr-1"></i> Selesai: {{ \Carbon\Carbon::parse($m->end_date)->format('d M Y') }}</p>
+                                    @endif
                                 </div>
                             </div>
-                            <!-- Content -->
-                            <div class="bg-gray-50 rounded p-3">
-                                <p class="text-sm text-gray-800 font-medium">{{ $m->description ?? 'Tidak ada deskripsi' }}</p>
-                                @if($m->cost)
-                                    <p class="text-xs text-gray-500 mt-1">Biaya: Rp {{ number_format($m->cost, 0, ',', '.') }}</p>
-                                @endif
-                                @if($m->end_date)
-                                    <p class="text-xs text-gray-500 mt-1">Selesai: {{ \Carbon\Carbon::parse($m->end_date)->format('d M Y') }}</p>
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="fas fa-inbox text-4xl opacity-30 mb-2"></i>
-                            <p>Belum ada riwayat pemeliharaan</p>
-                        </div>
-                    @endforelse
+                        @endif
+                    @endforeach
                 </div>
-            </div>
+            @else
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-inbox text-4xl opacity-30 mb-2"></i>
+                    <p>Belum ada histori kegiatan</p>
+                </div>
+            @endif
         </div>
-
     </div>
     
 </div>
@@ -496,81 +459,151 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const photoInput = document.getElementById('photo-input');
-        const photoDrop = document.getElementById('photo-drop');
-        const photoPreview = document.getElementById('photo-preview');
-        const previewList = document.getElementById('preview-list');
-        const photoPlaceholder = document.getElementById('photo-placeholder');
-        const fileCount = document.getElementById('file-count');
-        const clearPhotosBtn = document.getElementById('clear-photos');
+        function setupPhotoUpload(inputId, dropId, previewId, listId, placeholderId, countId, clearBtnId) {
+            const photoInput = document.getElementById(inputId);
+            const photoDrop = document.getElementById(dropId);
+            const photoPreview = document.getElementById(previewId);
+            const previewList = document.getElementById(listId);
+            const photoPlaceholder = document.getElementById(placeholderId);
+            const fileCount = document.getElementById(countId);
+            const clearPhotosBtn = document.getElementById(clearBtnId);
 
-        function handleFiles(files) {
-            previewList.innerHTML = '';
-            fileCount.textContent = '';
+            if (!photoInput || !photoDrop) return; // Skip if form doesn't exist on page
 
-            if (files.length === 0) {
-                photoPreview.classList.add('hidden');
-                photoPlaceholder.classList.remove('hidden');
-                return;
+            function handleFiles(files) {
+                previewList.innerHTML = '';
+                fileCount.textContent = '';
+
+                if (files.length === 0) {
+                    photoPreview.classList.add('hidden');
+                    photoPlaceholder.classList.remove('hidden');
+                    return;
+                }
+
+                photoPlaceholder.classList.add('hidden');
+                photoPreview.classList.remove('hidden');
+                fileCount.textContent = files.length + ' foto dipilih';
+
+                // Create preview for each selected file
+                Array.from(files).forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const preview = document.createElement('div');
+                            preview.className = 'relative group';
+                            preview.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview ${index + 1}" class="w-full h-24 object-cover rounded-lg border border-gray-200">
+                                <div class="absolute top-1 right-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Foto ${index + 1}</div>
+                            `;
+                            previewList.appendChild(preview);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
             }
 
-            photoPlaceholder.classList.add('hidden');
-            photoPreview.classList.remove('hidden');
-            fileCount.textContent = files.length + ' foto dipilih';
+            // File input change handler
+            photoInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
 
-            // Create preview for each selected file
-            Array.from(files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const preview = document.createElement('div');
-                        preview.className = 'relative group';
-                        preview.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview ${index + 1}" class="w-full h-24 object-cover rounded-lg border border-gray-200">
-                            <div class="absolute top-1 right-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">Foto ${index + 1}</div>
-                        `;
-                        previewList.appendChild(preview);
-                    };
-                    reader.readAsDataURL(file);
+            // Drag and drop handlers
+            photoDrop.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                photoDrop.classList.add('border-blue-500', 'bg-blue-50');
+            });
+
+            photoDrop.addEventListener('dragleave', () => {
+                photoDrop.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+
+            photoDrop.addEventListener('drop', (e) => {
+                e.preventDefault();
+                photoDrop.classList.remove('border-blue-500', 'bg-blue-50');
+                photoInput.files = e.dataTransfer.files;
+                handleFiles(photoInput.files);
+            });
+
+            // Click to select files (avoid triggering when clicking 'clear' button)
+            photoDrop.addEventListener('click', (e) => {
+                if(e.target !== clearPhotosBtn) {
+                    photoInput.click();
                 }
+            });
+
+            // Clear/Change photos button
+            clearPhotosBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                photoInput.value = '';
+                handleFiles([]);
             });
         }
 
-        // File input change handler
-        photoInput.addEventListener('change', function() {
-            handleFiles(this.files);
-        });
-
-        // Drag and drop handlers
-        photoDrop.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            photoDrop.classList.add('border-blue-500', 'bg-blue-50');
-        });
-
-        photoDrop.addEventListener('dragleave', () => {
-            photoDrop.classList.remove('border-blue-500', 'bg-blue-50');
-        });
-
-        photoDrop.addEventListener('drop', (e) => {
-            e.preventDefault();
-            photoDrop.classList.remove('border-blue-500', 'bg-blue-50');
-            photoInput.files = e.dataTransfer.files;
-            handleFiles(photoInput.files);
-        });
-
-        // Click to select files
-        photoDrop.addEventListener('click', () => {
-            photoInput.click();
-        });
-
-        // Clear/Change photos button
-        clearPhotosBtn.addEventListener('click', () => {
-            photoInput.value = '';
-            handleFiles([]);
-        });
+        // Initialize for "Unggah Foto Baru"
+        setupPhotoUpload('photo-input', 'photo-drop', 'photo-preview', 'preview-list', 'photo-placeholder', 'file-count', 'clear-photos');
+        // Initialize for "Foto Bukti Penyelesaian"
+        setupPhotoUpload('perbaikan-photo-input', 'perbaikan-photo-drop', 'perbaikan-photo-preview', 'perbaikan-preview-list', 'perbaikan-photo-placeholder', 'perbaikan-file-count', 'perbaikan-clear-photos');
     });
+</script>
 
-    // Gallery Variables
+<!-- Maintenance Modal -->
+<div id="maintenanceModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold text-gray-800"><i class="fas fa-tools text-blue-500 mr-2"></i> Pemeliharaan Rutin</h3>
+            <button onclick="document.getElementById('maintenanceModal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <form action="{{ route('asset-maintenance.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <input type="hidden" name="asset_id" value="{{ $asset->id }}">
+                <input type="hidden" name="maintenance_type" value="rutin">
+
+                <!-- Status Pemeliharaan -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status Pemeliharaan</label>
+                    <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="sedang_berjalan">Sedang Berjalan</option>
+                        <option value="selesai">Selesai</option>
+                    </select>
+                </div>
+
+                <!-- Tanggal Mulai -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
+                    <input type="date" name="start_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Tanggal Selesai -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi / Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Biaya -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
+                    <input type="number" name="cost" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="0">
+                </div>
+
+                <!-- Deskripsi -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Tindakan</label>
+                    <textarea name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Jelaskan tindakan pemeliharaan..."></textarea>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t mt-4">
+                    <button type="button" onclick="document.getElementById('maintenanceModal').classList.add('hidden')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded mr-2 hover:bg-gray-300 transition">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
     let galleryPhotos = [];
     let currentGalleryIndex = 0;
     let currentGalleryDate = null;
@@ -578,7 +611,7 @@
     // Initialize gallery when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
         // Collect all photos from gallery images
-        const galleryImages = document.querySelectorAll('[data-gallery=\"true\"]');
+        const galleryImages = document.querySelectorAll('[data-gallery="true"]');
         
         galleryImages.forEach(img => {
             const photoDate = img.getAttribute('data-gallery-date');
@@ -665,8 +698,8 @@
     }
 
     function updateGalleryButtons(photosForDate) {
-        const prevBtn = document.querySelector('button[onclick=\"prevGalleryPhoto()\"]');
-        const nextBtn = document.querySelector('button[onclick=\"nextGalleryPhoto()\"]');
+        const prevBtn = document.querySelector('button[onclick="prevGalleryPhoto()"]');
+        const nextBtn = document.querySelector('button[onclick="nextGalleryPhoto()"]');
         
         if (currentGalleryIndex === 0) {
             prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -707,54 +740,38 @@
             closeGallery();
         }
     });
-</script>
 
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-    const tabs = document.querySelectorAll('.tab-btn');
-    const contents = document.querySelectorAll('.tab-content');
-
-    tabs.forEach(tab => {
-
-        tab.addEventListener('click', () => {
-
-            tabs.forEach(btn => {
-                btn.classList.remove(
-                    'border-blue-500',
-                    'text-blue-600'
-                );
-
-                btn.classList.add(
-                    'border-transparent',
-                    'text-gray-500'
-                );
-            });
-
-            contents.forEach(content => {
-                content.classList.add('hidden');
-            });
-
-            tab.classList.remove(
-                'border-transparent',
-                'text-gray-500'
-            );
-
-            tab.classList.add(
-                'border-blue-500',
-                'text-blue-600'
-            );
-
-            document
-                .getElementById(`tab-${tab.dataset.tab}`)
-                .classList.remove('hidden');
-
-        });
-
+    // Modal listeners
+    document.getElementById('maintenanceModal')?.addEventListener('click', function(event) {
+        if (event.target === this) {
+            this.classList.add('hidden');
+        }
     });
 
-});
+    // Perbaikan form logic
+    const perbaikanStatus = document.getElementById('perbaikanStatus');
+    const selesaiFields = document.getElementById('selesaiFields');
+    const conditionAfter = document.getElementById('conditionAfter');
+    const perbaikanPhoto = document.getElementById('perbaikanPhoto');
+
+    if (perbaikanStatus) {
+        perbaikanStatus.addEventListener('change', function() {
+            if (this.value === 'selesai') {
+                selesaiFields.classList.remove('hidden');
+                conditionAfter.setAttribute('required', 'required');
+                perbaikanPhoto.setAttribute('required', 'required');
+            } else {
+                selesaiFields.classList.add('hidden');
+                conditionAfter.removeAttribute('required');
+                perbaikanPhoto.removeAttribute('required');
+                conditionAfter.value = '';
+                perbaikanPhoto.value = '';
+            }
+        });
+        
+        // Trigger once on load in case of old input
+        perbaikanStatus.dispatchEvent(new Event('change'));
+    }
 </script>
 @endpush
 
