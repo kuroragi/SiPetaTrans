@@ -4,11 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\AssetType;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class AssetController extends Controller
+class AssetController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view assets', only: ['index', 'show']),
+            new Middleware('permission:create assets', only: ['create', 'store']),
+            new Middleware('permission:edit assets', only: ['edit', 'update']),
+            new Middleware('permission:delete assets', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

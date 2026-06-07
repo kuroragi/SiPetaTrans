@@ -30,8 +30,10 @@ Route::post('/pengaduan-kerusakan', [DamageReportController::class, 'storePublic
 // Protected Routes
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('assets', AssetController::class);
     
+    // Assets
+    Route::resource('assets', AssetController::class);
+
     // Asset Depreciation Routes
     Route::prefix('assets/{asset}/depreciations')->name('asset-depreciations.')->group(function () {
         Route::get('/', [AssetDepreciationController::class, 'show'])->name('show');
@@ -40,6 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{depreciation}', [AssetDepreciationController::class, 'destroy'])->name('destroy');
     });
 
+    // Asset Types
     Route::resource('asset-types', AssetTypeController::class);
     Route::put('/asset-types/update-icon', [AssetTypeController::class, 'updateIcon'])->name('asset-types.update-icon');
 
@@ -53,34 +56,32 @@ Route::middleware('auth')->group(function () {
     // Asset Photo Routes
     Route::delete('/asset-photo/{photo}', [AssetMonitoringController::class, 'deletePhoto'])->name('asset-monitoring.delete-photo');
 
-    // Management Routes
+    // Damage Reports Routes
     Route::prefix('damage-reports')->name('damage-reports.')->group(function () {
         Route::get('/', [DamageReportController::class, 'index'])->name('index');
         Route::get('/{damageReport}', [DamageReportController::class, 'show'])->name('show');
         Route::put('/{damageReport}', [DamageReportController::class, 'update'])->name('update');
     });
 
+    // Users
     Route::resource('users', UserController::class);
+
+    // Roles
     Route::resource('roles', RoleController::class);
+
+    // Permissions
     Route::resource('permissions', PermissionController::class);
+
+    // Asset Maintenance
     Route::resource('asset-maintenance', AssetMaintenanceController::class);
 
+    // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::post('/print', [ReportController::class, 'print'])->name('print');
     });
 });
 
-// Route::get('/send-email-test', function(){
-//     try {
-//         Mail::to('uum1612@gmail.com')
-//             ->queue(new AssetReportMail(
-//                 'Pengaduan Kerusakan Aset',
-//                 'Telah diterima pengaduan kerusakan'
-//             ));
-
-//         dd('Email berhasil dikirim');
-//     } catch (\Exception $e) {
-//         dd($e->getMessage());
-// }
-// });
+Route::get('check-permission', function () {
+    dd(auth()->user()->getAllPermissions()->pluck('name'));
+});

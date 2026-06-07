@@ -18,18 +18,6 @@ class SecondRolePermissionSeeder extends Seeder
 
         // Create Permissions
         $permissions = [
-            'view assets',
-            'create assets',
-            'edit assets',
-            'delete assets',
-            'view asset types',
-            'create asset types',
-            'edit asset types',
-            'delete asset types',
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
             'view roles',
             'create roles',
             'edit roles',
@@ -59,21 +47,16 @@ class SecondRolePermissionSeeder extends Seeder
         }
 
         // Create Roles and assign created permissions
-        $roleAdmin = Role::create(['name' => 'super-admin']);
+        $roleAdmin = Role::where('name', 'super-admin')->firstOrFail();
         $roleAdmin->givePermissionTo(Permission::all());
 
-        $roleOperator = Role::create(['name' => 'operator']);
-        $roleOperator->givePermissionTo([
-            'view assets',
-            'create assets',
-            'edit assets',
-            'view asset types',
-        ]);
+        // Assign to operator (all except delete)
+        $roleOperator = Role::where('name', 'operator')->firstOrFail();
+        $operatorPermissions = collect($permissions)->reject(function ($name) {
+            return str_contains($name, 'delete');
+        });
+        $roleOperator->givePermissionTo($operatorPermissions->toArray());
         
-        $roleViewer = Role::create(['name' => 'viewer']);
-        $roleViewer->givePermissionTo([
-            'view assets',
-            'view asset types',
-        ]);
+        // Viewer gets no additional permissions in this seeder
     }
 }

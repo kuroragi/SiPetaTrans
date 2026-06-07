@@ -42,31 +42,26 @@
                         Aset
                     </div>
                     <hr class="my-6 border-gray-200 dark:border-gray-700" />
+                    @can('view assets')
                     <a href="{{ route('assets.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('assets.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-map w-5"></i>
                         <span>Peta Aset</span>
                     </a>
+                    @endcan
+                    @can('view asset types')
                     <a href="{{ route('asset-types.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('asset-types.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <i class="fas fa-palette w-5"></i>
                         <span>Kelola Kategori</span>
                     </a>
-                    <!--a href="#"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-map w-5"></i>
-                        <span>Peta Trayek</span>
-                    </a>
-                    <a href="#"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-camera w-5"></i>
-                        <span>CCTV</span>
-                    </a-->
+                    @endcan
                     <div
                         class="my-6 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Laporan
                     </div>
                     <hr class="my-6 border-gray-200 dark:border-gray-700" />
+                    @can('view assets monitoring')
                     <a href="{{ route('asset-monitoring.index') }}"
                         class="flex items-center justify-between px-4 py-3 rounded-lg {{ Route::is('asset-monitoring.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <div class="flex items-center space-x-3">
@@ -77,6 +72,8 @@
                             <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ $damagedAssetsCount }}</span>
                         @endif
                     </a>
+                    @endcan
+                    @can('view damage reports')
                     <a href="{{ route('damage-reports.index') }}"
                         class="flex items-center justify-between px-4 py-3 rounded-lg {{ Route::is('damage-reports.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                         <div class="flex items-center space-x-3">
@@ -87,22 +84,14 @@
                             <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ $newDamageReportsCount }}</span>
                         @endif
                     </a>
-                    <a href="{{ route('asset-maintenance.index') }}"
-                    {{-- <a href="#" --}}
-                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-wrench w-5"></i>
-                        <span>Pemeliharaan</span>
-                    </a>
+                    @endcan
+                    @can('view reports')
                     <a href="{{ route('reports.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
                         <i class="fas fa-file-pdf w-5"></i>
                         <span>Laporan</span>
                     </a>
-                    <a href="#"
-                        class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-bell w-5"></i>
-                        <span>Notifikasi</span>
-                    </a>
+                    @endcan
                     <div
                         class="my-6 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Autentikasi
@@ -115,14 +104,14 @@
                             <span>Manajemen Pengguna</span>
                         </a>
                     @endcan
-                    @can('view roless')
+                    @can('view roles')
                         <a href="{{ route('roles.index') }}"
                             class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('roles.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                             <i class="fas fa-user-shield w-5"></i>
                             <span>Manajemen Role</span>
                         </a>
                     @endcan
-                    @can('view roles')
+                    @can('view permissions')
                         <a href="{{ route('permissions.index') }}"
                             class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('permissions.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
                             <i class="fas fa-key w-5"></i>

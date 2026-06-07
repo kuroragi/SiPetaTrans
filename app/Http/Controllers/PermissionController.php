@@ -7,8 +7,20 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-class PermissionController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class PermissionController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view permissions', only: ['index', 'show']),
+            new Middleware('permission:create permissions', only: ['create', 'store']),
+            new Middleware('permission:edit permissions', only: ['edit', 'update']),
+            new Middleware('permission:delete permissions', only: ['destroy']),
+        ];
+    }
     public function index(Request $request)
     {
         $query = Permission::query()->withCount('roles');

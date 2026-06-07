@@ -8,8 +8,20 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
-class UserController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view users', only: ['index', 'show']),
+            new Middleware('permission:create users', only: ['create', 'store']),
+            new Middleware('permission:edit users', only: ['edit', 'update']),
+            new Middleware('permission:delete users', only: ['destroy']),
+        ];
+    }
     public function index(Request $request)
     {
         $query = User::query()->with('roles');

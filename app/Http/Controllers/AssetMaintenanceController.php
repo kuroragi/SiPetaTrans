@@ -5,8 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\AssetMaintenance;
 use Illuminate\Http\Request;
 
-class AssetMaintenanceController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AssetMaintenanceController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view maintenances', only: ['index', 'show']),
+            new Middleware('permission:create maintenances', only: ['create', 'store']),
+            new Middleware('permission:edit maintenances', only: ['edit', 'update']),
+            new Middleware('permission:delete maintenances', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

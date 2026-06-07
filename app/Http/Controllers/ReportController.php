@@ -10,8 +10,18 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class ReportController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class ReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view reports', only: ['index']),
+            new Middleware('permission:print reports', only: ['print']),
+        ];
+    }
     public function index(){
         $assetTypes = AssetType::all();
         return view('reports.index', compact('assetTypes'));

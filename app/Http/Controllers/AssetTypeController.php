@@ -6,8 +6,20 @@ use App\Models\AssetType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AssetTypeController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AssetTypeController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view asset types', only: ['index', 'show']),
+            new Middleware('permission:create asset types', only: ['create', 'store']),
+            new Middleware('permission:edit asset types', only: ['edit', 'update', 'updateIcon']),
+            new Middleware('permission:delete asset types', only: ['destroy']),
+        ];
+    }
     /**
      * Display list of asset types with icon management
      */

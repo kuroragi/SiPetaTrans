@@ -7,8 +7,19 @@ use App\Models\AssetMonitoring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class AssetMonitoringController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AssetMonitoringController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view assets monitoring', only: ['index', 'show']),
+            new Middleware('permission:create assets monitoring', only: ['uploadPhoto']),
+            new Middleware('permission:delete assets monitoring', only: ['deletePhoto']),
+        ];
+    }
     /**
      * List all assets for monitoring
      */

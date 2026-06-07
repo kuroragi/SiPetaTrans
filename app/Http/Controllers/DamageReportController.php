@@ -9,8 +9,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
-class DamageReportController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class DamageReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view damage reports', only: ['index', 'show']),
+            new Middleware('permission:edit damage reports', only: ['update']),
+        ];
+    }
     public function storePublic(Request $request)
     {
         $validated = $request->validate([
