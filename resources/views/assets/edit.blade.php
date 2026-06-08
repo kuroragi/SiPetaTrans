@@ -267,6 +267,17 @@
                     </div>
                 </div>
 
+                <!-- Section Sub Asset (Dynamic) -->
+                <div id="sub_assets_section" class="mb-8 pb-8 border-b" style="display: none;">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-boxes text-orange-600"></i> Detail Sub-Aset
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4">Karena jumlah aset lebih dari 1, mohon lengkapi detail untuk masing-masing sub-aset di bawah ini.</p>
+                    <div id="sub_assets_container" class="space-y-6">
+                        <!-- Dynamic sub assets will be appended here -->
+                    </div>
+                </div>
+
                 <!-- Section 3: Lokasi & Koordinat -->
                 <div class="mb-8 pb-8 border-b">
                     <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
@@ -513,11 +524,108 @@
             marker.setLatLng([lat, lng]);
         }
 
+        const existingSubAssets = @json($asset->subAssets ?? []);
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             updateCategoryPreview();
             initializeMap();
+
+            // Initialize sub assets based on quantity
+            const qtyInput = document.getElementById('quantity');
+            if (qtyInput) {
+                // Initial check
+                handleQuantityChange(qtyInput.value, true);
+                
+                // Add event listener
+                qtyInput.addEventListener('input', function() {
+                    handleQuantityChange(this.value, false);
+                });
+            }
         });
+
+        function handleQuantityChange(value, isInitial = false) {
+            let qty = parseInt(value);
+            const section = document.getElementById('sub_assets_section');
+            const container = document.getElementById('sub_assets_container');
+            
+            if (isNaN(qty) || qty <= 1) {
+                section.style.display = 'none';
+                container.innerHTML = '';
+            } else {
+                section.style.display = 'block';
+                renderSubAssets(qty, container, isInitial);
+            }
+        }
+
+        function renderSubAssets(qty, container, isInitial) {
+            const currentCount = container.children.length;
+            if (qty > currentCount) {
+                for (let i = currentCount; i < qty; i++) {
+                    const existingData = existingSubAssets[i] ? existingSubAssets[i] : null;
+                    const idInput = existingData ? `<input type="hidden" name="sub_assets[${i}][id]" value="${existingData.id}">` : '';
+                    
+                    const statusVal = existingData ? existingData.status : 'baik';
+                    const descVal = existingData && existingData.description ? existingData.description : '';
+                    
+                    let photoHtml = '';
+                    if (existingData && existingData.photo_path) {
+                        photoHtml = `<div class="mb-2" id="preview_wrapper_${i}"><img id="preview_img_${i}" src="/storage/${existingData.photo_path}" class="h-24 rounded border object-cover"></div>`;
+                    } else {
+                        photoHtml = `<div class="mb-2 hidden" id="preview_wrapper_${i}"><img id="preview_img_${i}" class="h-24 rounded border object-cover"></div>`;
+                    }
+
+                    const html = `
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 relative sub-asset-item">
+                            ${idInput}
+                            <h4 class="font-bold text-gray-700 mb-4">Sub Aset #${i + 1}</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Sub-Aset</label>
+                                    ${photoHtml}
+                                    <input type="file" name="sub_assets[${i}][photo]" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white" onchange="previewSubAssetImage(this, ${i})">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                                    <select name="sub_assets[${i}][status]" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white" required>
+                                        <option value="baik" ${statusVal === 'baik' ? 'selected' : ''}>Baik</option>
+                                        <option value="perlu_perbaikan" ${statusVal === 'perlu_perbaikan' ? 'selected' : ''}>Perlu Perbaikan</option>
+                                        <option value="rusak" ${statusVal === 'rusak' ? 'selected' : ''}>Rusak</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi/Catatan</label>
+                                    <textarea name="sub_assets[${i}][description]" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white" placeholder="Contoh: Nomor seri, letak persis, dsb.">${descVal}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', html);
+                }
+            } else if (qty < currentCount) {
+                for (let i = currentCount - 1; i >= qty; i--) {
+                    container.removeChild(container.lastElementChild);
+                }
+            }
+        }
+
+        function previewSubAssetImage(input, index) {
+            const previewWrapper = document.getElementById(`preview_wrapper_${index}`);
+            const previewImg = document.getElementById(`preview_img_${index}`);
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewWrapper.classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // If they cancel file selection, we might want to revert to existing photo.
+                // For simplicity, we just clear the preview if there was no existing photo.
+                // We'll leave it as is if they just cancel the dialog.
+            }
+        }
     </script>
 
     <script>

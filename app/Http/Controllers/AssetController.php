@@ -89,16 +89,22 @@ class AssetController extends Controller implements HasMiddleware
             'description' => 'nullable|string',
             'last_maintenance' => 'nullable|date',
             'last_maintenance_photo' => 'nullable|image',
+            'sub_assets' => 'nullable|array',
+            'sub_assets.*.description' => 'nullable|string',
+            'sub_assets.*.status' => 'required_with:sub_assets|in:baik,perlu_perbaikan,rusak',
+            'sub_assets.*.photo' => 'nullable|image',
         ]);
 
         $photoPath = null;
+        $uploadedSubPhotos = [];
+        
         if($request->hasFile('last_maintenance_photo')){
             $photoPath = $request->file('last_maintenance_photo')->store('assets', 'public');
             $validated['last_maintenance_photo'] = $photoPath;
         }
 
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $photoPath) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $request, $photoPath, &$uploadedSubPhotos) {
                 $asset = Asset::create($validated);
 
                 if ($photoPath) {
@@ -111,12 +117,33 @@ class AssetController extends Controller implements HasMiddleware
                         'captured_by' => auth()->user()->name ?? 'System',
                     ]);
                 }
+                
+                if ($request->has('sub_assets') && $validated['quantity'] > 1) {
+                    foreach ($request->sub_assets as $subData) {
+                        $subPhotoPath = null;
+                        if (isset($subData['photo']) && $subData['photo']->isValid()) {
+                            $subPhotoPath = $subData['photo']->store('sub-assets', 'public');
+                            $uploadedSubPhotos[] = $subPhotoPath;
+                        }
+                        \App\Models\SubAsset::create([
+                            'asset_id' => $asset->id,
+                            'photo_path' => $subPhotoPath,
+                            'description' => $subData['description'] ?? null,
+                            'status' => $subData['status'] ?? 'baik',
+                        ]);
+                    }
+                }
             });
 
             return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan');
         } catch (\Exception $e) {
             if ($photoPath) {
                 Storage::disk('public')->delete($photoPath);
+            }
+            if (!empty($uploadedSubPhotos)) {
+                foreach ($uploadedSubPhotos as $path) {
+                    Storage::disk('public')->delete($path);
+                }
             }
             return back()->withInput()->with('error', 'Gagal menambahkan aset: ' . $e->getMessage());
         }
@@ -164,18 +191,114 @@ class AssetController extends Controller implements HasMiddleware
             'description' => 'nullable|string',
             'last_maintenance' => 'nullable|date',
             'last_maintenance_photo' => 'nullable|image',
+            'sub_assets' => 'nullable|array',
+            'sub_assets.*.id' => 'nullable|exists:sub_assets,id',
+            'sub_assets.*.description' => 'nullable|string',
+            'sub_assets.*.status' => 'required_with:sub_assets|in:baik,perlu_perbaikan,rusak',
+            'sub_assets.*.photo' => 'nullable|image',
         ]);
 
-        if($request->hasFile('last_maintenance_photo')){
-            if(!empty($asset->last_maintenance_photo)){
-                Storage::disk('public')->delete($asset->last_maintenance_photo);
-            }
+        $photoPath = null;
+        $uploadedSubPhotos = [];
+        $oldPhotoPath = $asset->last_maintenance_photo;
 
-            $validated['last_maintenance_photo'] = $request->file('last_maintenance_photo')->store('assets', 'public');
+        if($request->hasFile('last_maintenance_photo')){
+            $photoPath = $request->file('last_maintenance_photo')->store('assets', 'public');
+            $validated['last_maintenance_photo'] = $photoPath;
         }
 
-        $asset->update($validated);
-        return redirect()->route('assets.index')->with('success', 'Aset berhasil diperbarui');
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $request, $asset, $photoPath, &$uploadedSubPhotos) {
+                $asset->update($validated);
+
+                if ($photoPath) {
+                    \App\Models\AssetMonitoring::create([
+                        'asset_id' => $asset->id,
+                        'photo_path' => $photoPath,
+                        'condition' => $validated['status'],
+                        'notes' => 'Update aset',
+                        'photo_date' => now(),
+                        'captured_by' => auth()->user()->name ?? 'System',
+                    ]);
+                }
+                
+                // Handle sub_assets if quantity > 1
+                if ($validated['quantity'] > 1) {
+                    $providedSubAssetIds = collect($request->sub_assets ?? [])->pluck('id')->filter()->toArray();
+                    
+                    // Delete sub_assets that are not in the request
+                    $subAssetsToDelete = $asset->subAssets()->whereNotIn('id', $providedSubAssetIds)->get();
+                    foreach ($subAssetsToDelete as $subAsset) {
+                        if ($subAsset->photo_path) {
+                            Storage::disk('public')->delete($subAsset->photo_path);
+                        }
+                        $subAsset->delete();
+                    }
+
+                    if ($request->has('sub_assets')) {
+                        foreach ($request->sub_assets as $subData) {
+                            $subPhotoPath = null;
+                            if (isset($subData['photo']) && $subData['photo']->isValid()) {
+                                $subPhotoPath = $subData['photo']->store('sub-assets', 'public');
+                                $uploadedSubPhotos[] = $subPhotoPath;
+                            }
+
+                            if (!empty($subData['id'])) {
+                                // Update existing
+                                $subAsset = \App\Models\SubAsset::find($subData['id']);
+                                if ($subAsset) {
+                                    $oldSubPhoto = $subAsset->photo_path;
+                                    $subAsset->update([
+                                        'photo_path' => $subPhotoPath ?: $subAsset->photo_path,
+                                        'description' => $subData['description'] ?? null,
+                                        'status' => $subData['status'] ?? 'baik',
+                                    ]);
+                                    // if new photo uploaded, delete old
+                                    if ($subPhotoPath && $oldSubPhoto) {
+                                        Storage::disk('public')->delete($oldSubPhoto);
+                                    }
+                                }
+                            } else {
+                                // Create new
+                                \App\Models\SubAsset::create([
+                                    'asset_id' => $asset->id,
+                                    'photo_path' => $subPhotoPath,
+                                    'description' => $subData['description'] ?? null,
+                                    'status' => $subData['status'] ?? 'baik',
+                                ]);
+                            }
+                        }
+                    }
+                } else {
+                    // if quantity is 1 or less, delete all sub_assets
+                    $allSubAssets = $asset->subAssets;
+                    foreach ($allSubAssets as $subAsset) {
+                        if ($subAsset->photo_path) {
+                            Storage::disk('public')->delete($subAsset->photo_path);
+                        }
+                        $subAsset->delete();
+                    }
+                }
+            });
+
+            // If main photo was updated successfully, delete the old one
+            if ($photoPath && $oldPhotoPath) {
+                Storage::disk('public')->delete($oldPhotoPath);
+            }
+
+            return redirect()->route('assets.index')->with('success', 'Aset berhasil diperbarui');
+        } catch (\Exception $e) {
+            // Rollback uploaded photos
+            if ($photoPath) {
+                Storage::disk('public')->delete($photoPath);
+            }
+            if (!empty($uploadedSubPhotos)) {
+                foreach ($uploadedSubPhotos as $path) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+            return back()->withInput()->with('error', 'Gagal memperbarui aset: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -24,7 +24,8 @@
             </span>
         </td>
         <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->location ?? '-' }}</td>
-        <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->current_value ?? '0' }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700">
+            {{ $asset->current_value ? 'Rp. ' . number_format($asset->current_value, 0, ',', '.') : '0' }}</td>
         <td class="px-6 py-4 text-sm text-gray-700">{{ $asset->acquisition_source ?? '-' }}</td>
         <td class="px-6 py-4 text-sm flex gap-2">
             <a href="{{ route('assets.show', $asset) }}" class="text-blue-600 hover:text-blue-800">
