@@ -559,7 +559,17 @@
             <form action="{{ route('asset-maintenance.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="asset_id" value="{{ $asset->id }}">
-                <input type="hidden" name="maintenance_type" value="rutin">
+                
+                <!-- Tipe Pemeliharaan -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Pemeliharaan</label>
+                    <select name="maintenance_type" id="modal_maintenance_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="rutin">Rutin</option>
+                        @if($asset->status === 'perlu_perbaikan' || ($photos->first() && $photos->first()->condition === 'perlu_perbaikan'))
+                            <option value="perbaikan">Perbaikan Kerusakan</option>
+                        @endif
+                    </select>
+                </div>
 
                 <!-- Status Pemeliharaan -->
                 <div>

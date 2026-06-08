@@ -34,14 +34,31 @@
             <i class="fas fa-wrench text-blue-500"></i> Buat Data Pemeliharaan
         </h3>
 
-        <form action="#" method="POST" class="space-y-4">
+        <form action="{{ route('asset-maintenance.store') }}" method="POST" class="space-y-4">
+            @csrf
+            
+            <!-- Pilih Aset -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Aset</label>
+                <select name="asset_id" id="asset_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    <option value="">-- Pilih Aset --</option>
+                    @if(isset($assets))
+                        @foreach($assets as $asset)
+                            <option value="{{ $asset->id }}" {{ (isset($selectedAsset) && $selectedAsset->id == $asset->id) ? 'selected' : '' }} data-status="{{ $asset->status }}">
+                                {{ $asset->name }} - {{ $asset->registration_number }}
+                            </option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+
             <!-- Tipe Pemeliharaan -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tipe Pemeliharaan</label>
-                <select name="maintenance_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                <select name="maintenance_type" id="maintenance_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">-- Pilih Tipe --</option>
                     <option value="rutin">Rutin</option>
-                    <option value="perbaikan">Perbaikan Kerusakan</option>
+                    <option value="perbaikan" id="option_perbaikan" style="display: none;">Perbaikan Kerusakan</option>
                 </select>
             </div>
 
@@ -162,3 +179,28 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const assetSelect = document.getElementById('asset_id');
+        const perbaikanOption = document.getElementById('option_perbaikan');
+        const maintenanceTypeSelect = document.getElementById('maintenance_type');
+        
+        function updateOptions() {
+            const selectedOption = assetSelect.options[assetSelect.selectedIndex];
+            if (selectedOption && selectedOption.dataset.status === 'perlu_perbaikan') {
+                perbaikanOption.style.display = '';
+            } else {
+                perbaikanOption.style.display = 'none';
+                if (maintenanceTypeSelect.value === 'perbaikan') {
+                    maintenanceTypeSelect.value = '';
+                }
+            }
+        }
+        
+        assetSelect.addEventListener('change', updateOptions);
+        updateOptions(); // Initial check
+    });
+</script>
+@endpush

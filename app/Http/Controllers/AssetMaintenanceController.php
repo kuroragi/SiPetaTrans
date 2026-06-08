@@ -34,9 +34,12 @@ class AssetMaintenanceController extends Controller implements HasMiddleware
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('asset-maintenance.create');
+        $assets = \App\Models\Asset::all();
+        $selectedAsset = $request->query('asset_id') ? \App\Models\Asset::find($request->query('asset_id')) : null;
+        
+        return view('asset-maintenance.create', compact('assets', 'selectedAsset'));
     }
 
     /**

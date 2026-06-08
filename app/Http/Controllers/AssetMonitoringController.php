@@ -27,6 +27,8 @@ class AssetMonitoringController extends Controller implements HasMiddleware
     {
         $assets = Asset::with(['type', 'monitorings' => function($query) {
             $query->latest('photo_date')->limit(1);
+        }, 'maintenance' => function($query) {
+            $query->latest('start_date')->limit(1);
         }])->get();
 
         return view('asset-monitoring.index', [

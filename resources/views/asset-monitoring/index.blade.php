@@ -85,6 +85,27 @@
                         @forelse($assets as $asset)
                             @php
                                 $latestPhoto = $asset->monitorings->first();
+                                $latestMaintenance = $asset->maintenance->first();
+                                
+                                $photoDate = $latestPhoto ? \Carbon\Carbon::parse($latestPhoto->photo_date) : null;
+                                $maintenanceDate = $latestMaintenance ? \Carbon\Carbon::parse($latestMaintenance->start_date) : null;
+                                
+                                $currentCondition = null;
+                                
+                                if ($photoDate && $maintenanceDate) {
+                                    if ($photoDate > $maintenanceDate) {
+                                        $currentCondition = $latestPhoto->condition;
+                                    } else {
+                                        $currentCondition = $latestMaintenance->status === 'selesai' ? 'baik' : 'dalam_pemeliharaan';
+                                    }
+                                } elseif ($photoDate) {
+                                    $currentCondition = $latestPhoto->condition;
+                                } elseif ($maintenanceDate) {
+                                    $currentCondition = $latestMaintenance->status === 'selesai' ? 'baik' : 'dalam_pemeliharaan';
+                                } else {
+                                    $currentCondition = $asset->status;
+                                }
+
                                 $statusColors = [
                                     'baik' => 'bg-green-100 text-green-800',
                                     'perlu_perbaikan' => 'bg-yellow-100 text-yellow-800',
@@ -92,7 +113,7 @@
                                     'dalam_pemeliharaan' => 'bg-purple-100 text-purple-800',
                                 ];
                                 $statusClass =
-                                    $statusColors[$latestPhoto?->condition ?? 'baik'] ?? 'bg-gray-100 text-gray-800';
+                                    $statusColors[$currentCondition ?? 'baik'] ?? 'bg-gray-100 text-gray-800';
                             @endphp
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ $loop->iteration }}</td>
@@ -123,13 +144,9 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    @if ($latestPhoto)
-                                        <span class="px-2 py-1 rounded text-xs font-semibold {{ $statusClass }}">
-                                            {{ ucfirst(str_replace('_', ' ', $latestPhoto->condition)) }}
-                                        </span>
-                                    @else
-                                        <span class="text-gray-500 italic text-xs">-</span>
-                                    @endif
+                                    <span class="px-2 py-1 rounded text-xs font-semibold {{ $statusClass }}">
+                                        {{ ucfirst(str_replace('_', ' ', $currentCondition ?? 'baik')) }}
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <a href="{{ route('asset-monitoring.show', $asset) }}"
