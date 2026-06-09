@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 
 <head>
@@ -750,7 +750,9 @@
 
         html:not(.dark) #map-search,
         html:not(.dark) #filter-status,
-        html:not(.dark) #filter-type {
+        html:not(.dark) #filter-type,
+        html:not(.dark) #filter-trayek,
+        html:not(.dark) #filter-mode {
             background: rgba(255, 255, 255, .88) !important;
             border-color: var(--bd) !important;
             color: var(--t2) !important;
@@ -1363,23 +1365,41 @@
                             style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px 8px 30px;color:#e2e8f0;font-size:12px;outline:none;"
                             oninput="filterMarkers()" />
                     </div>
-                    <select id="filter-status"
-                        style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
-                        onchange="filterMarkers()">
-                        <option value="">Semua Kondisi</option>
-                        <option value="baik">Baik</option>
-                        <option value="perlu_perbaikan">Perlu Perbaikan</option>
-                        <option value="rusak">Rusak</option>
-                        <option value="dalam_pemeliharaan">Dalam Pemeliharaan</option>
+                    <select id="filter-mode"
+                        style="background:rgba(26,86,219,.1);border:1.5px solid rgba(26,86,219,.3);border-radius:8px;padding:8px 12px;color:#38bdf8;font-size:12px;font-weight:700;outline:none;min-width:140px;"
+                        onchange="toggleMapMode()">
+                        <option value="aset">Peta Aset</option>
+                        <option value="trayek">Peta Rute Trayek</option>
                     </select>
-                    <select id="filter-type"
-                        style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
-                        onchange="filterMarkers()">
-                        <option value="">Semua Jenis</option>
-                        @foreach ($assets->groupBy(fn($a) => $a->type?->name ?? 'Lainnya') as $typeName => $group)
-                            <option value="{{ $typeName }}">{{ $typeName }}</option>
-                        @endforeach
-                    </select>
+                    <div id="aset-filters" style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <select id="filter-status"
+                            style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
+                            onchange="filterMarkers()">
+                            <option value="">Semua Kondisi</option>
+                            <option value="baik">Baik</option>
+                            <option value="perlu_perbaikan">Perlu Perbaikan</option>
+                            <option value="rusak">Rusak</option>
+                            <option value="dalam_pemeliharaan">Dalam Pemeliharaan</option>
+                        </select>
+                        <select id="filter-type"
+                            style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
+                            onchange="filterMarkers()">
+                            <option value="">Semua Jenis</option>
+                            @foreach ($assets->groupBy(fn($a) => $a->type?->name ?? 'Lainnya') as $typeName => $group)
+                                <option value="{{ $typeName }}">{{ $typeName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="trayek-filters" style="display:none;">
+                        <select id="filter-trayek"
+                            style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
+                            onchange="renderMapData()">
+                            <option value="">Semua Trayek</option>
+                            @foreach ($trayeks as $trayek)
+                                <option value="{{ $trayek->id }}">{{ $trayek->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <button onclick="resetMapFilter()" class="btn-ghost" style="font-size:11px;padding:8px 14px;">
                         <i class="fas fa-rotate-left"></i> Reset
                     </button>
@@ -1942,6 +1962,7 @@
         });
 
         const assetData = @json($assetData);
+        const trayekData = @json($trayeks);
 
         const STATUS_COLORS = {
             baik: '#22c55e',
@@ -2062,6 +2083,8 @@
 
         // ---- Main map with filter ----
         let mainMap, mainCluster, allMarkers = [];
+        let trayekLayers = [];
+        let mapMode = 'aset';
 
         (function() {
             mainMap = buildMap('main-map');
@@ -2085,42 +2108,126 @@
                 });
                 mk._assetData = a;
                 allMarkers.push(mk);
-                mainCluster.addLayer(mk);
             });
 
-            mainMap.addLayer(mainCluster);
-            const pts = assetData.filter(a => a.latitude && a.longitude).map(a => [a.latitude, a.longitude]);
-            if (pts.length) mainMap.fitBounds(pts, {
-                padding: [40, 40]
-            });
+            renderMapData();
         })();
+
+        function toggleMapMode() {
+            mapMode = document.getElementById('filter-mode').value;
+            if (mapMode === 'aset') {
+                document.getElementById('aset-filters').style.display = 'flex';
+                document.getElementById('trayek-filters').style.display = 'none';
+            } else {
+                document.getElementById('aset-filters').style.display = 'none';
+                document.getElementById('trayek-filters').style.display = 'block';
+            }
+            renderMapData();
+        }
+
+        // Generate dynamic distinct color from index
+        function getTrayekColor(index) {
+            const hue = (index * 137.508) % 360; 
+            return `hsl(${hue}, 80%, 55%)`;
+        }
+
+        function renderMapData() {
+            mainCluster.clearLayers();
+            trayekLayers.forEach(layer => mainMap.removeLayer(layer));
+            trayekLayers = [];
+            
+            if (mapMode === 'aset') {
+                filterMarkers();
+            } else if (mapMode === 'trayek') {
+                filterTrayeks();
+            }
+        }
+
+        function filterTrayeks() {
+            const selectedTrayekId = document.getElementById('filter-trayek').value;
+            let n = 0;
+            const pts = [];
+
+            trayekData.forEach((trayek, index) => {
+                if (selectedTrayekId && trayek.id.toString() !== selectedTrayekId) return;
+                if (!trayek.coordinate || !Array.isArray(trayek.coordinate)) return;
+                
+                const color = getTrayekColor(index);
+                const polyline = L.polyline(trayek.coordinate, {
+                    color: color,
+                    weight: 6,
+                    opacity: 0.8,
+                    dashArray: '10, 10',
+                    lineJoin: 'round'
+                });
+                
+                polyline.bindPopup(`
+                    <div style="min-width:200px;font-family:'Segoe UI',sans-serif;">
+                        <div style="font-weight:800;font-size:14px;color:#fff;background:${color};padding:8px 12px;border-radius:6px;margin-bottom:8px;">
+                            ${trayek.name}
+                        </div>
+                        <div style="font-size:12px;color:#94a3b8;">
+                            Jarak: <strong style="color:#e2e8f0;">${trayek.distance} km</strong>
+                        </div>
+                    </div>
+                `, {
+                    className: 'custom-popup'
+                });
+
+                trayekLayers.push(polyline);
+                polyline.addTo(mainMap);
+                trayek.coordinate.forEach(coord => pts.push(coord));
+                n++;
+            });
+
+            document.getElementById('visible-count').textContent = n;
+            if (pts.length > 0) {
+                mainMap.fitBounds(pts, { padding: [40, 40] });
+            }
+        }
 
         function filterMarkers() {
             const q = (document.getElementById('map-search').value || '').toLowerCase();
             const status = document.getElementById('filter-status').value;
             const type = document.getElementById('filter-type').value;
-            mainCluster.clearLayers();
+            
             let n = 0;
+            const pts = [];
+
             allMarkers.forEach(mk => {
                 const a = mk._assetData;
-                const ok = (!q || a.name.toLowerCase().includes(q) || (a.location || '').toLowerCase().includes(
-                        q)) &&
+                const ok = (!q || a.name.toLowerCase().includes(q) || (a.location || '').toLowerCase().includes(q)) &&
                     (!status || a.status === status) &&
                     (!type || (a.type || '') === type);
                 if (ok) {
                     mainCluster.addLayer(mk);
+                    pts.push([a.latitude, a.longitude]);
                     n++;
                 }
             });
+            
+            mainMap.addLayer(mainCluster);
             document.getElementById('visible-count').textContent = n;
+            
+            if (pts.length > 0) {
+                mainMap.fitBounds(pts, { padding: [40, 40] });
+            }
         }
 
         function resetMapFilter() {
-            ['map-search', 'filter-status', 'filter-type'].forEach(id => {
+            ['map-search', 'filter-status', 'filter-type', 'filter-trayek'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
-            filterMarkers();
+            
+            // Map mode reset
+            const modeEl = document.getElementById('filter-mode');
+            if (modeEl) {
+                modeEl.value = 'aset';
+                toggleMapMode();
+            } else {
+                renderMapData();
+            }
         }
 
         // ---- Upload handlers ----
