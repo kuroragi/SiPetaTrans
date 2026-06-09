@@ -1213,6 +1213,13 @@
                             <div id="hero-map"></div>
                         </div>
 
+                        {{-- overlay button to fullscreen map --}}
+                        <div style="position:absolute;bottom:12px;right:12px;z-index:1000;">
+                            <a href="#peta-aset" class="btn-primary" style="padding:8px 16px;font-size:12px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border-radius:8px;">
+                                <i class="fas fa-expand"></i> Peta Penuh & Filter
+                            </a>
+                        </div>
+
                         {{-- overlay stats --}}
                         <div id="hero-stats-overlay" class="glass"
                             style="position:absolute;top:12px;right:12px;border-radius:12px;padding:12px 14px;font-size:11px;min-width:160px;">
@@ -2076,6 +2083,27 @@
 
             hmap.addLayer(cluster);
             const pts = assetData.filter(a => a.latitude && a.longitude).map(a => [a.latitude, a.longitude]);
+            
+            // Draw all trayek lines in hero map
+            trayekData.forEach((trayek, index) => {
+                if (!trayek.coordinate || !Array.isArray(trayek.coordinate)) return;
+                const color = getTrayekColor(index);
+                const polyline = L.polyline(trayek.coordinate, {
+                    color: color,
+                    weight: 4,
+                    opacity: 0.7,
+                    dashArray: '8, 8',
+                    lineJoin: 'round'
+                });
+                polyline.bindPopup(`
+                    <div style="font-family:'Segoe UI',sans-serif;font-size:13px;font-weight:700;">
+                        ${trayek.name}
+                    </div>
+                `, {className: 'custom-popup'});
+                polyline.addTo(hmap);
+                trayek.coordinate.forEach(coord => pts.push(coord));
+            });
+
             if (pts.length) hmap.fitBounds(pts, {
                 padding: [20, 20]
             });
