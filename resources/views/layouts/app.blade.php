@@ -56,6 +56,13 @@
                         <span>Kelola Kategori</span>
                     </a>
                     @endcan
+                    @can('view trayeks')
+                    <a href="{{ route('trayeks.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('trayeks.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <i class="fas fa-route w-5"></i>
+                        <span>Manajemen Trayek</span>
+                    </a>
+                    @endcan
                     <div
                         class="my-6 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Laporan

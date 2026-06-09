@@ -13,6 +13,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AssetDepreciationController;
+use App\Http\Controllers\TrayekController;
 use App\Mail\AssetReportMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,9 @@ Route::middleware('auth')->group(function () {
     
     // Assets
     Route::resource('assets', AssetController::class);
+
+    // Trayeks
+    Route::resource('trayeks', TrayekController::class);
 
     // Asset Depreciation Routes
     Route::prefix('assets/{asset}/depreciations')->name('asset-depreciations.')->group(function () {
