@@ -232,7 +232,7 @@
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="general-asset-field">
+                        <div>
                             <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Kondisi Aset
                             </label>
@@ -242,8 +242,9 @@
                                 <option value="baik" {{ $asset->status == 'baik' ? 'selected' : '' }}>✅ Baik</option>
                                 <option value="perlu_perbaikan"
                                     {{ $asset->status == 'perlu_perbaikan' ? 'selected' : '' }}>⚠️ Perlu Perbaikan</option>
-                                <option value="rusak" {{ $asset->status == 'rusak' ? 'selected' : '' }}>❌ Rusak</option>
-                                <option value="dalam_pemeliharaan"
+                                <option class="general-asset-field" value="rusak"
+                                    {{ $asset->status == 'rusak' ? 'selected' : '' }}>❌ Rusak</option>
+                                <option class="general-asset-field" value="dalam_pemeliharaan"
                                     {{ $asset->status == 'dalam_pemeliharaan' ? 'selected' : '' }}>🔧 Dalam Pemeliharaan
                                 </option>
                             </select>
