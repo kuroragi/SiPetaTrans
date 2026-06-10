@@ -32,6 +32,7 @@ class Asset extends Model
         'tariff_type',
         'manager',
         'is_active',
+        'area',
     ];
 
     protected $casts = [

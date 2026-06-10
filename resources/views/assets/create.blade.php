@@ -181,6 +181,13 @@
                                 </select>
                             </div>
                             <div>
+                                <label for="area"
+                                    class="block text-sm font-semibold text-gray-700 mb-2">Ukuran/Luas(m<sup>2</sup>)</label>
+                                <input type="decimal" id="area" name="area"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('area') }}">
+                            </div>
+                            <div>
                                 <label for="manager"
                                     class="block text-sm font-semibold text-gray-700 mb-2">Pengelola</label>
                                 <input type="text" id="manager" name="manager"
