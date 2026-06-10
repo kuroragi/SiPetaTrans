@@ -1374,7 +1374,7 @@
                     <div id="aset-filters" style="display:flex;gap:10px;flex-wrap:wrap;">
                         <select id="filter-type"
                             style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
-                            onchange="filterMarkers()">
+                            onchange="renderMapData()">
                             <option value="">Semua Jenis</option>
                             @foreach ($assets->groupBy(fn($a) => $a->type?->name ?? 'Lainnya') as $typeName => $group)
                                 <option value="{{ $typeName }}">{{ $typeName }}</option>
@@ -1382,7 +1382,7 @@
                         </select>
                         <select id="filter-status"
                             style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
-                            onchange="filterMarkers()">
+                            onchange="renderMapData()">
                             <option value="">Semua Kondisi</option>
                             <option value="baik">Baik</option>
                             <option value="perlu_perbaikan">Perlu Perbaikan</option>
