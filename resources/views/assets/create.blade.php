@@ -60,8 +60,7 @@
                                 <option value="">-- Pilih Kategori Aset --</option>
                                 @foreach ($assetTypes as $type)
                                     <option value="{{ $type->id }}" data-icon="{{ $type->icon }}"
-                                        data-color="{{ $type->color }}"
-                                        data-category="{{ $type->asset_category }}"
+                                        data-color="{{ $type->color }}" data-category="{{ $type->asset_category }}"
                                         data-geometry="{{ $type->geometry }}"
                                         {{ old('asset_type_id') == $type->id ? 'selected' : '' }}
                                         data-subtypes='@json($type->subtypes)'>
@@ -144,32 +143,49 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label for="vehicle_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kendaraan</label>
-                                <select id="vehicle_type" name="vehicle_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateVehicleType()">
+                                <label for="vehicle_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis
+                                    Kendaraan</label>
+                                <select id="vehicle_type" name="vehicle_type"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onchange="updateVehicleType()">
                                     <option value="">-- Pilih Jenis --</option>
                                     <option value="R2" {{ old('vehicle_type') == 'R2' ? 'selected' : '' }}>R2</option>
                                     <option value="R4" {{ old('vehicle_type') == 'R4' ? 'selected' : '' }}>R4</option>
-                                    <option value="R2/R4" {{ old('vehicle_type') == 'R2/R4' ? 'selected' : '' }}>R2/R4</option>
+                                    <option value="R2/R4" {{ old('vehicle_type') == 'R2/R4' ? 'selected' : '' }}>R2/R4
+                                    </option>
                                 </select>
                             </div>
                             <div id="r2_field" style="display: none;">
-                                <label for="r2" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas R2</label>
-                                <input type="number" id="r2" name="r2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('r2') }}">
+                                <label for="r2" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas
+                                    R2</label>
+                                <input type="number" id="r2" name="r2"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('r2') }}">
                             </div>
                             <div id="r4_field" style="display: none;">
-                                <label for="r4" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas R4</label>
-                                <input type="number" id="r4" name="r4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('r4') }}">
+                                <label for="r4" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas
+                                    R4</label>
+                                <input type="number" id="r4" name="r4"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('r4') }}">
                             </div>
                             <div>
-                                <label for="tariff_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Tarif</label>
-                                <select id="tariff_type" name="tariff_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="flat" {{ old('tariff_type') == 'flat' ? 'selected' : '' }}>Flat</option>
-                                    <option value="progresive" {{ old('tariff_type') == 'progresive' ? 'selected' : '' }}>Progresive</option>
+                                <label for="tariff_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis
+                                    Tarif</label>
+                                <select id="tariff_type" name="tariff_type"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="flat" {{ old('tariff_type') == 'flat' ? 'selected' : '' }}>Flat
+                                    </option>
+                                    <option value="progresive" {{ old('tariff_type') == 'progresive' ? 'selected' : '' }}>
+                                        Progresive</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="manager" class="block text-sm font-semibold text-gray-700 mb-2">Pengelola</label>
-                                <input type="text" id="manager" name="manager" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('manager') }}">
+                                <label for="manager"
+                                    class="block text-sm font-semibold text-gray-700 mb-2">Pengelola</label>
+                                <input type="text" id="manager" name="manager"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('manager') }}">
                             </div>
                         </div>
                     </div>
@@ -309,7 +325,8 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                         <i class="fas fa-boxes text-orange-600"></i> Detail Sub-Aset
                     </h3>
-                    <p class="text-sm text-gray-600 mb-4">Karena jumlah aset lebih dari 1, mohon lengkapi detail untuk masing-masing sub-aset di bawah ini.</p>
+                    <p class="text-sm text-gray-600 mb-4">Karena jumlah aset lebih dari 1, mohon lengkapi detail untuk
+                        masing-masing sub-aset di bawah ini.</p>
                     <div id="sub_assets_container" class="space-y-6">
                         <!-- Dynamic sub assets will be appended here -->
                     </div>
@@ -330,6 +347,22 @@
                             placeholder="Contoh: Jalan Jend. Sudirman No. 123, Bukittinggi"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('location') border-red-500 @enderror">
                         @error('location')
+                            <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="is_active" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Status Aktif <span class="text-red-500">*</span>
+                        </label>
+                        <select id="is_active" name="is_active"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('is_active') border-red-500 @enderror"
+                            required>
+                            <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Aktif</option>
+                            <option value="0" {{ old('is_active') == '0' ? 'selected' : '' }}>Nonaktif</option>
+                        </select>
+                        @error('is_active')
                             <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                 {{ $message }}</p>
                         @enderror
@@ -456,21 +489,21 @@
                 return;
             }
 
-                const assetType = assetTypes.find(t => t.id == selectedOption.value);
+            const assetType = assetTypes.find(t => t.id == selectedOption.value);
             if (assetType) {
                 document.getElementById('categoryIcon').innerHTML = `<i class="fas ${assetType.icon}"></i>`;
                 document.getElementById('categoryIcon').style.color = assetType.color;
                 document.getElementById('categoryName').textContent = assetType.name;
                 document.getElementById('categoryDesc').textContent = assetType.description;
                 document.getElementById('categoryPreview').classList.remove('hidden');
-                
+
                 // Show/hide fields based on category
                 const isParking = assetType.asset_category === 'parking_asset';
                 document.querySelectorAll('.general-asset-field').forEach(el => {
                     el.style.display = isParking ? 'none' : 'block';
                 });
                 document.getElementById('parking_asset_fields').style.display = isParking ? 'block' : 'none';
-                if(isParking) updateVehicleType();
+                if (isParking) updateVehicleType();
 
                 // Show/hide lat/lng based on geometry
                 const isPolygon = assetType.geometry === 'polygon';
@@ -486,7 +519,9 @@
                     const isPoint = !isPolygon && !isPolyline;
 
                     drawControl = new L.Control.Draw({
-                        edit: { featureGroup: drawnItems },
+                        edit: {
+                            featureGroup: drawnItems
+                        },
                         draw: {
                             polygon: isPolygon,
                             polyline: isPolyline,
@@ -571,7 +606,7 @@
             }).addTo(map);
 
             map.addLayer(drawnItems);
-            
+
             marker = L.marker([defaultLat, defaultLng]).bindPopup('Klik pada peta untuk menentukan lokasi aset');
             drawnItems.addLayer(marker);
 
@@ -591,7 +626,7 @@
             });
             map.addControl(drawControl);
 
-            map.on(L.Draw.Event.CREATED, function (event) {
+            map.on(L.Draw.Event.CREATED, function(event) {
                 const layer = event.layer;
                 const type = event.layerType;
 
@@ -609,7 +644,7 @@
                     // getLatLngs() returns nested array for polygon
                     const flatLatLngs = type === 'polygon' ? latlngs[0] : latlngs;
                     coords = flatLatLngs.map(ll => [ll.lat, ll.lng]);
-                    
+
                     // set lat/lng to first point for fallback
                     if (coords.length > 0) {
                         document.getElementById('latitude').value = coords[0][0].toFixed(6);
@@ -622,7 +657,8 @@
 
             // Fallback for marker click mapping if marker is used
             map.on('click', function(e) {
-                const geom = document.getElementById('asset_type_id').options[document.getElementById('asset_type_id').selectedIndex]?.dataset.geometry || 'point';
+                const geom = document.getElementById('asset_type_id').options[document.getElementById(
+                    'asset_type_id').selectedIndex]?.dataset.geometry || 'point';
                 if (geom !== 'point') return;
 
                 const lat = e.latlng.lat;
@@ -630,7 +666,9 @@
 
                 document.getElementById('latitude').value = lat.toFixed(6);
                 document.getElementById('longitude').value = lng.toFixed(6);
-                document.getElementById('coordinates').value = JSON.stringify([parseFloat(lat.toFixed(6)), parseFloat(lng.toFixed(6))]);
+                document.getElementById('coordinates').value = JSON.stringify([parseFloat(lat.toFixed(6)),
+                    parseFloat(lng.toFixed(6))
+                ]);
 
                 updateMarkerPosition(lat, lng);
             });
@@ -656,11 +694,11 @@
             if (!map) return;
 
             map.setView([lat, lng], 13);
-            
+
             // Only update marker if it's a point geometry
             const select = document.getElementById('asset_type_id');
             const geom = select.options[select.selectedIndex]?.dataset.geometry || 'point';
-            
+
             if (geom === 'point') {
                 drawnItems.clearLayers();
                 marker = L.marker([lat, lng]).bindPopup('Lokasi Aset');
@@ -678,7 +716,7 @@
             if (qtyInput) {
                 // Initial check
                 handleQuantityChange(qtyInput.value);
-                
+
                 // Add event listener
                 qtyInput.addEventListener('input', function() {
                     handleQuantityChange(this.value);
@@ -690,7 +728,7 @@
             let qty = parseInt(value);
             const section = document.getElementById('sub_assets_section');
             const container = document.getElementById('sub_assets_container');
-            
+
             if (isNaN(qty) || qty <= 1) {
                 section.style.display = 'none';
                 container.innerHTML = '';
@@ -742,7 +780,7 @@
         function previewSubAssetImage(input, index) {
             const previewWrapper = document.getElementById(`preview_wrapper_${index}`);
             const previewImg = document.getElementById(`preview_img_${index}`);
-            
+
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {

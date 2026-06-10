@@ -9,7 +9,7 @@ class LandingController extends Controller
 {
     public function index()
     {
-        $assets = Asset::with('type')->get();
+        $assets = Asset::with('type')->where('is_active', true)->get();
         $trayeks = Trayek::all();
 
         $assetData = $assets

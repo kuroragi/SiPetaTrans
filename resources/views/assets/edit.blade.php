@@ -61,8 +61,7 @@
                                 required onchange="updateCategoryPreview()">
                                 @foreach ($assetTypes as $type)
                                     <option value="{{ $type->id }}" data-icon="{{ $type->icon }}"
-                                        data-color="{{ $type->color }}"
-                                        data-category="{{ $type->asset_category }}"
+                                        data-color="{{ $type->color }}" data-category="{{ $type->asset_category }}"
                                         data-geometry="{{ $type->geometry }}"
                                         {{ $asset->asset_type_id == $type->id ? 'selected' : '' }}>
                                         {{ $type->name }}
@@ -152,32 +151,56 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
-                                <label for="vehicle_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kendaraan</label>
-                                <select id="vehicle_type" name="vehicle_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateVehicleType()">
+                                <label for="vehicle_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis
+                                    Kendaraan</label>
+                                <select id="vehicle_type" name="vehicle_type"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onchange="updateVehicleType()">
                                     <option value="">-- Pilih Jenis --</option>
-                                    <option value="R2" {{ old('vehicle_type', $asset->vehicle_type) == 'R2' ? 'selected' : '' }}>R2</option>
-                                    <option value="R4" {{ old('vehicle_type', $asset->vehicle_type) == 'R4' ? 'selected' : '' }}>R4</option>
-                                    <option value="R2/R4" {{ old('vehicle_type', $asset->vehicle_type) == 'R2/R4' ? 'selected' : '' }}>R2/R4</option>
+                                    <option value="R2"
+                                        {{ old('vehicle_type', $asset->vehicle_type) == 'R2' ? 'selected' : '' }}>R2
+                                    </option>
+                                    <option value="R4"
+                                        {{ old('vehicle_type', $asset->vehicle_type) == 'R4' ? 'selected' : '' }}>R4
+                                    </option>
+                                    <option value="R2/R4"
+                                        {{ old('vehicle_type', $asset->vehicle_type) == 'R2/R4' ? 'selected' : '' }}>R2/R4
+                                    </option>
                                 </select>
                             </div>
                             <div id="r2_field" style="display: none;">
-                                <label for="r2" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas R2</label>
-                                <input type="number" id="r2" name="r2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('r2', $asset->r2) }}">
+                                <label for="r2" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas
+                                    R2</label>
+                                <input type="number" id="r2" name="r2"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('r2', $asset->r2) }}">
                             </div>
                             <div id="r4_field" style="display: none;">
-                                <label for="r4" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas R4</label>
-                                <input type="number" id="r4" name="r4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('r4', $asset->r4) }}">
+                                <label for="r4" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas
+                                    R4</label>
+                                <input type="number" id="r4" name="r4"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('r4', $asset->r4) }}">
                             </div>
                             <div>
-                                <label for="tariff_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Tarif</label>
-                                <select id="tariff_type" name="tariff_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="flat" {{ old('tariff_type', $asset->tariff_type) == 'flat' ? 'selected' : '' }}>Flat</option>
-                                    <option value="progresive" {{ old('tariff_type', $asset->tariff_type) == 'progresive' ? 'selected' : '' }}>Progresive</option>
+                                <label for="tariff_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis
+                                    Tarif</label>
+                                <select id="tariff_type" name="tariff_type"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="flat"
+                                        {{ old('tariff_type', $asset->tariff_type) == 'flat' ? 'selected' : '' }}>Flat
+                                    </option>
+                                    <option value="progresive"
+                                        {{ old('tariff_type', $asset->tariff_type) == 'progresive' ? 'selected' : '' }}>
+                                        Progresive</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="manager" class="block text-sm font-semibold text-gray-700 mb-2">Pengelola</label>
-                                <input type="text" id="manager" name="manager" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('manager', $asset->manager) }}">
+                                <label for="manager"
+                                    class="block text-sm font-semibold text-gray-700 mb-2">Pengelola</label>
+                                <input type="text" id="manager" name="manager"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    value="{{ old('manager', $asset->manager) }}">
                             </div>
                         </div>
                     </div>
@@ -307,7 +330,8 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                         <i class="fas fa-boxes text-orange-600"></i> Detail Sub-Aset
                     </h3>
-                    <p class="text-sm text-gray-600 mb-4">Karena jumlah aset lebih dari 1, mohon lengkapi detail untuk masing-masing sub-aset di bawah ini.</p>
+                    <p class="text-sm text-gray-600 mb-4">Karena jumlah aset lebih dari 1, mohon lengkapi detail untuk
+                        masing-masing sub-aset di bawah ini.</p>
                     <div id="sub_assets_container" class="space-y-6">
                         <!-- Dynamic sub assets will be appended here -->
                     </div>
@@ -320,7 +344,8 @@
                     </h3>
 
                     <div class="mb-6">
-                        <input type="hidden" name="coordinates" id="coordinates" value="{{ is_array($asset->coordinates) ? json_encode($asset->coordinates) : $asset->coordinates }}">
+                        <input type="hidden" name="coordinates" id="coordinates"
+                            value="{{ is_array($asset->coordinates) ? json_encode($asset->coordinates) : $asset->coordinates }}">
                         <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">
                             Alamat/Deskripsi Lokasi <span class="text-red-500">*</span>
                         </label>
@@ -332,13 +357,32 @@
                                 {{ $message }}</p>
                         @enderror
 
+                        <div>
+                            <label for="is_active" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Status Aktif <span class="text-red-500">*</span>
+                            </label>
+                            <select id="is_active" name="is_active"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('is_active') border-red-500 @enderror"
+                                required>
+                                <option value="1"
+                                    {{ old('is_active', $asset->is_active ?? 1) == 1 ? 'selected' : '' }}>Aktif</option>
+                                <option value="0"
+                                    {{ old('is_active', $asset->is_active ?? 1) == 0 ? 'selected' : '' }}>Nonaktif</option>
+                            </select>
+                            @error('is_active')
+                                <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="latlng_wrapper">
                             <div>
                                 <label for="latitude" class="block text-sm font-semibold text-gray-700 mb-2">
                                     Latitude <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" id="latitude" name="latitude"
-                                    value="{{ old('latitude', $asset->latitude) }}" step="0.000001" placeholder="-6.2088"
+                                    value="{{ old('latitude', $asset->latitude) }}" step="0.000001"
+                                    placeholder="-6.2088"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('latitude') border-red-500 @enderror">
                                 <p class="text-xs text-gray-500 mt-1">Default: Bukittinggi</p>
                                 @error('latitude')
@@ -352,7 +396,8 @@
                                     Longitude <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" id="longitude" name="longitude"
-                                    value="{{ old('longitude', $asset->longitude) }}" step="0.000001" placeholder="106.8456"
+                                    value="{{ old('longitude', $asset->longitude) }}" step="0.000001"
+                                    placeholder="106.8456"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('longitude') border-red-500 @enderror">
                                 <p class="text-xs text-gray-500 mt-1">Default: Bukittinggi</p>
                                 @error('longitude')
@@ -466,7 +511,7 @@
 
         function updateCategoryPreview() {
             const select = document.getElementById('asset_type_id');
-            if(select.selectedIndex === -1) return;
+            if (select.selectedIndex === -1) return;
             const selectedOption = select.options[select.selectedIndex];
 
             const assetType = assetTypes.find(t => t.id == selectedOption.value);
@@ -475,14 +520,14 @@
                 document.getElementById('categoryIcon').style.color = assetType.color;
                 document.getElementById('categoryName').textContent = assetType.name;
                 document.getElementById('categoryDesc').textContent = assetType.description;
-                
+
                 // Show/hide fields based on category
                 const isParking = assetType.asset_category === 'parking_asset';
                 document.querySelectorAll('.general-asset-field').forEach(el => {
                     el.style.display = isParking ? 'none' : 'block';
                 });
                 document.getElementById('parking_asset_fields').style.display = isParking ? 'block' : 'none';
-                if(isParking) updateVehicleType();
+                if (isParking) updateVehicleType();
 
                 // Show/hide lat/lng based on geometry
                 const isPolygon = assetType.geometry === 'polygon';
@@ -498,7 +543,9 @@
                     const isPoint = !isPolygon && !isPolyline;
 
                     drawControl = new L.Control.Draw({
-                        edit: { featureGroup: drawnItems },
+                        edit: {
+                            featureGroup: drawnItems
+                        },
                         draw: {
                             polygon: isPolygon,
                             polyline: isPolyline,
@@ -626,7 +673,7 @@
             });
             map.addControl(drawControl);
 
-            map.on(L.Draw.Event.CREATED, function (event) {
+            map.on(L.Draw.Event.CREATED, function(event) {
                 const layer = event.layer;
                 const type = event.layerType;
 
@@ -643,7 +690,7 @@
                     const latlngs = layer.getLatLngs();
                     const flatLatLngs = type === 'polygon' ? latlngs[0] : latlngs;
                     newCoords = flatLatLngs.map(ll => [ll.lat, ll.lng]);
-                    
+
                     if (newCoords.length > 0) {
                         document.getElementById('latitude').value = newCoords[0][0].toFixed(6);
                         document.getElementById('longitude').value = newCoords[0][1].toFixed(6);
@@ -655,7 +702,8 @@
 
             // Map click event - fallback for point
             map.on('click', function(e) {
-                const geomCurrent = document.getElementById('asset_type_id').options[document.getElementById('asset_type_id').selectedIndex]?.dataset.geometry || 'point';
+                const geomCurrent = document.getElementById('asset_type_id').options[document.getElementById(
+                    'asset_type_id').selectedIndex]?.dataset.geometry || 'point';
                 if (geomCurrent !== 'point') return;
 
                 const newLat = e.latlng.lat;
@@ -664,7 +712,9 @@
                 // Update input fields
                 document.getElementById('latitude').value = newLat.toFixed(6);
                 document.getElementById('longitude').value = newLng.toFixed(6);
-                document.getElementById('coordinates').value = JSON.stringify([parseFloat(newLat.toFixed(6)), parseFloat(newLng.toFixed(6))]);
+                document.getElementById('coordinates').value = JSON.stringify([parseFloat(newLat.toFixed(6)),
+                    parseFloat(newLng.toFixed(6))
+                ]);
 
                 // Update marker position
                 updateMarkerPosition(newLat, newLng);
@@ -691,11 +741,11 @@
             if (!map) return;
 
             map.setView([lat, lng], 13);
-            
+
             // Only update marker if it's a point geometry
             const select = document.getElementById('asset_type_id');
             const geom = select.options[select.selectedIndex]?.dataset.geometry || 'point';
-            
+
             if (geom === 'point') {
                 drawnItems.clearLayers();
                 marker = L.marker([lat, lng]).bindPopup('Lokasi Saat Ini');
@@ -715,7 +765,7 @@
             if (qtyInput) {
                 // Initial check
                 handleQuantityChange(qtyInput.value, true);
-                
+
                 // Add event listener
                 qtyInput.addEventListener('input', function() {
                     handleQuantityChange(this.value, false);
@@ -727,7 +777,7 @@
             let qty = parseInt(value);
             const section = document.getElementById('sub_assets_section');
             const container = document.getElementById('sub_assets_container');
-            
+
             if (isNaN(qty) || qty <= 1) {
                 section.style.display = 'none';
                 container.innerHTML = '';
@@ -742,16 +792,19 @@
             if (qty > currentCount) {
                 for (let i = currentCount; i < qty; i++) {
                     const existingData = existingSubAssets[i] ? existingSubAssets[i] : null;
-                    const idInput = existingData ? `<input type="hidden" name="sub_assets[${i}][id]" value="${existingData.id}">` : '';
-                    
+                    const idInput = existingData ?
+                        `<input type="hidden" name="sub_assets[${i}][id]" value="${existingData.id}">` : '';
+
                     const statusVal = existingData ? existingData.status : 'baik';
                     const descVal = existingData && existingData.description ? existingData.description : '';
-                    
+
                     let photoHtml = '';
                     if (existingData && existingData.photo_path) {
-                        photoHtml = `<div class="mb-2" id="preview_wrapper_${i}"><img id="preview_img_${i}" src="/storage/${existingData.photo_path}" class="h-24 rounded border object-cover"></div>`;
+                        photoHtml =
+                            `<div class="mb-2" id="preview_wrapper_${i}"><img id="preview_img_${i}" src="/storage/${existingData.photo_path}" class="h-24 rounded border object-cover"></div>`;
                     } else {
-                        photoHtml = `<div class="mb-2 hidden" id="preview_wrapper_${i}"><img id="preview_img_${i}" class="h-24 rounded border object-cover"></div>`;
+                        photoHtml =
+                            `<div class="mb-2 hidden" id="preview_wrapper_${i}"><img id="preview_img_${i}" class="h-24 rounded border object-cover"></div>`;
                     }
 
                     const html = `
@@ -791,7 +844,7 @@
         function previewSubAssetImage(input, index) {
             const previewWrapper = document.getElementById(`preview_wrapper_${index}`);
             const previewImg = document.getElementById(`preview_img_${index}`);
-            
+
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {

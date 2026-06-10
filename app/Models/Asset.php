@@ -31,6 +31,7 @@ class Asset extends Model
         'r4',
         'tariff_type',
         'manager',
+        'is_active',
     ];
 
     protected $casts = [
@@ -38,6 +39,7 @@ class Asset extends Model
         'longitude' => 'float',
         'last_maintenance' => 'date',
         'coordinates' => 'array',
+        'is_active' => 'boolean',
     ];
 
     public function type(): BelongsTo

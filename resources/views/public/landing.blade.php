@@ -1365,13 +1365,6 @@
                 {{-- Filter toolbar --}}
                 <div id="map-toolbar"
                     style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 18px;background:rgba(8,18,36,.96);border-bottom:1px solid rgba(255,255,255,.07);">
-                    <div style="position:relative;flex:1;min-width:160px;">
-                        <i class="fas fa-search"
-                            style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#475569;font-size:11px;"></i>
-                        <input id="map-search" type="text" placeholder="Cari nama atau lokasi aset..."
-                            style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px 8px 30px;color:#e2e8f0;font-size:12px;outline:none;"
-                            oninput="filterMarkers()" />
-                    </div>
                     <select id="filter-mode"
                         style="background:rgba(26,86,219,.1);border:1.5px solid rgba(26,86,219,.3);border-radius:8px;padding:8px 12px;color:#38bdf8;font-size:12px;font-weight:700;outline:none;min-width:140px;"
                         onchange="toggleMapMode()">
@@ -1379,6 +1372,14 @@
                         <option value="trayek">Peta Rute Trayek</option>
                     </select>
                     <div id="aset-filters" style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <select id="filter-type"
+                            style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
+                            onchange="filterMarkers()">
+                            <option value="">Semua Jenis</option>
+                            @foreach ($assets->groupBy(fn($a) => $a->type?->name ?? 'Lainnya') as $typeName => $group)
+                                <option value="{{ $typeName }}">{{ $typeName }}</option>
+                            @endforeach
+                        </select>
                         <select id="filter-status"
                             style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
                             onchange="filterMarkers()">
@@ -1387,14 +1388,6 @@
                             <option value="perlu_perbaikan">Perlu Perbaikan</option>
                             <option value="rusak">Rusak</option>
                             <option value="dalam_pemeliharaan">Dalam Pemeliharaan</option>
-                        </select>
-                        <select id="filter-type"
-                            style="background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;min-width:140px;outline:none;"
-                            onchange="filterMarkers()">
-                            <option value="">Semua Jenis</option>
-                            @foreach ($assets->groupBy(fn($a) => $a->type?->name ?? 'Lainnya') as $typeName => $group)
-                                <option value="{{ $typeName }}">{{ $typeName }}</option>
-                            @endforeach
                         </select>
                     </div>
                     <div id="trayek-filters" style="display:none;">
@@ -2237,7 +2230,6 @@
         }
 
         function filterMarkers() {
-            const q = (document.getElementById('map-search').value || '').toLowerCase();
             const status = document.getElementById('filter-status').value;
             const type = document.getElementById('filter-type').value;
             
@@ -2246,8 +2238,7 @@
 
             allMarkers.forEach(mk => {
                 const a = mk._assetData;
-                const ok = (!q || a.name.toLowerCase().includes(q) || (a.location || '').toLowerCase().includes(q)) &&
-                    (!status || a.status === status) &&
+                const ok = (!status || a.status === status) &&
                     (!type || (a.type || '') === type);
                 if (ok) {
                     mainCluster.addLayer(mk);
@@ -2269,7 +2260,7 @@
         }
 
         function resetMapFilter() {
-            ['map-search', 'filter-status', 'filter-type', 'filter-trayek'].forEach(id => {
+            ['filter-status', 'filter-type', 'filter-trayek'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
