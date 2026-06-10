@@ -12,6 +12,9 @@ class AssetType extends Model
         'icon',
         'color',
         'description',
+        'geometry',
+        'asset_category',
+        'is_active',
     ];
 
     public function assets(): HasMany

@@ -51,6 +51,53 @@
                         placeholder="Jelaskan kategori aset ini...">{{ old('description') }}</textarea>
                 </div>
 
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Kategori Sistem -->
+                    <div>
+                        <label for="asset_category" class="block text-sm font-bold text-gray-700 mb-3">
+                            <i class="fas fa-layer-group text-blue-600 mr-2"></i> Kategori Sistem <span class="text-red-500">*</span>
+                        </label>
+                        <select id="asset_category" name="asset_category"
+                            class="w-full px-4 py-3 border-2 @error('asset_category') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:border-blue-500 transition"
+                            required>
+                            <option value="general_asset" {{ old('asset_category') == 'general_asset' ? 'selected' : '' }}>General Asset</option>
+                            <option value="parking_asset" {{ old('asset_category') == 'parking_asset' ? 'selected' : '' }}>Parking Asset</option>
+                        </select>
+                        @error('asset_category')
+                            <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    <!-- Geometry -->
+                    <div>
+                        <label for="geometry" class="block text-sm font-bold text-gray-700 mb-3">
+                            <i class="fas fa-draw-polygon text-blue-600 mr-2"></i> Geometry Peta <span class="text-red-500">*</span>
+                        </label>
+                        <select id="geometry" name="geometry"
+                            class="w-full px-4 py-3 border-2 @error('geometry') border-red-500 @else border-gray-300 @enderror rounded-lg focus:outline-none focus:border-blue-500 transition"
+                            required>
+                            <option value="point" {{ old('geometry') == 'point' ? 'selected' : '' }}>Point (Titik)</option>
+                            <option value="polygon" {{ old('geometry') == 'polygon' ? 'selected' : '' }}>Polygon (Area)</option>
+                            <option value="polyline" {{ old('geometry') == 'polyline' ? 'selected' : '' }}>Polyline (Garis)</option>
+                        </select>
+                        @error('geometry')
+                            <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Status Aktif -->
+                <div class="mb-8">
+                    <label class="flex items-center gap-3">
+                        <input type="checkbox" name="is_active" id="is_active" class="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500" {{ old('is_active', true) ? 'checked' : '' }}>
+                        <span class="text-sm font-bold text-gray-700">Aktifkan Kategori Ini</span>
+                    </label>
+                </div>
+
                 <!-- Grid Layout untuk Icon dan Warna -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <!-- Icon Selection -->

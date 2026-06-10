@@ -20,9 +20,10 @@ class LandingController extends Controller
                     'type' => $asset->type?->name,
                     'icon' => $asset->type?->icon ?? 'fa-cube',
                     'status' => $asset->status,
-                    'latitude' => $asset->latitude,
-                    'longitude' => $asset->longitude,
                     'location' => $asset->location,
+                    'geometry' => $asset->type?->geometry ?? 'point',
+                    'color' => $asset->type?->color ?? '#3b82f6',
+                    'coordinates' => is_string($asset->coordinates) ? json_decode($asset->coordinates, true) : $asset->coordinates,
                 ];
             })
             ->values();

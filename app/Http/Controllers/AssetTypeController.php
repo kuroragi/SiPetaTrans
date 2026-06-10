@@ -67,9 +67,13 @@ class AssetTypeController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255|unique:asset_types',
             'icon' => 'required|string|max:50',
             'color' => 'required|regex:/^#[0-9A-F]{6}$/i',
+            'geometry' => 'required|in:point,polygon,polyline',
+            'asset_category' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'subtypes' => 'nullable|array'
         ]);
+        
+        $validated['is_active'] = $request->has('is_active');
 
         DB::transaction(function () use ($validated) {
             $assetType = AssetType::create($validated);
@@ -115,9 +119,13 @@ class AssetTypeController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255|unique:asset_types,name,' . $assetType->id,
             'icon' => 'nullable|string|max:50',
             'color' => 'nullable|regex:/^#[0-9A-F]{6}$/i',
+            'geometry' => 'required|in:point,polygon,polyline',
+            'asset_category' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'subtypes' => 'nullable|array'
         ]);
+
+        $validated['is_active'] = $request->has('is_active');
 
         DB::transaction(function () use ($assetType, $validated) {
             $assetType->update($validated);

@@ -1133,8 +1133,8 @@
 
                     <h1
                         style="font-size:clamp(2.2rem,4.5vw,3.6rem);font-weight:900;line-height:1.07;color:#fff;margin-top:8px;">
-                        Pemetaan Aset<br>
-                        <span class="text-gradient">Transportasi</span><br>
+                        Pemetaan Aset &<br>
+                        <span class="text-gradient">Rute Trayek Transportasi</span><br>
                         Kota Secara<br>
                         <span style="color:#f59e0b;">Digital & Real-Time</span>
                     </h1>
@@ -1346,7 +1346,7 @@
                     <div class="sec-badge"><i class="fas fa-satellite-dish" style="color:#4ade80;"></i> GIS Live Map
                     </div>
                     <h2 style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;">Peta Sebaran Aset
-                        Transportasi</h2>
+                        dan Rute Trayek Transportasi</h2>
                     <p style="color:#64748b;font-size:13px;margin-top:4px;">Interaktif · Multi-Layer · Real-Time ·
                         Filterable</p>
                 </div>
@@ -1403,7 +1403,7 @@
                             onchange="renderMapData()">
                             <option value="">Semua Trayek</option>
                             @foreach ($trayeks as $trayek)
-                                <option value="{{ $trayek->id }}">{{ $trayek->name }}</option>
+                                <option value="{{ $trayek->id }}">{{ $trayek->code }} - {{ $trayek->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -2067,13 +2067,27 @@
                 position: 'bottomright'
             }).addTo(hmap);
             const cluster = makeCluster();
+            const pts = [];
 
             assetData.forEach(a => {
-                if (!a.latitude || !a.longitude) return;
-                const mk = L.marker([a.latitude, a.longitude], {
-                    icon: makeIcon(STATUS_COLORS[a.status] || '#3b82f6', a.icon || 'fa-cube'),
-                    title: a.name,
-                });
+                if (!a.coordinates) return;
+                let mk;
+                if (a.geometry === 'polygon') {
+                    mk = L.polygon(a.coordinates, { color: a.color || '#3b82f6', weight: 2, fillColor: a.color || '#3b82f6', fillOpacity: 0.4 });
+                    a.coordinates.forEach(c => pts.push(c));
+                } else if (a.geometry === 'polyline') {
+                    mk = L.polyline(a.coordinates, { color: a.color || '#3b82f6', weight: 3 });
+                    a.coordinates.forEach(c => pts.push(c));
+                } else {
+                    let lat = a.coordinates[0];
+                    let lng = a.coordinates[1];
+                    mk = L.marker([lat, lng], {
+                        icon: makeIcon(STATUS_COLORS[a.status] || '#3b82f6', a.icon || 'fa-cube'),
+                        title: a.name,
+                    });
+                    pts.push([lat, lng]);
+                }
+                
                 mk.bindPopup(makePopup(a), {
                     className: 'custom-popup',
                     maxWidth: 280
@@ -2082,7 +2096,6 @@
             });
 
             hmap.addLayer(cluster);
-            const pts = assetData.filter(a => a.latitude && a.longitude).map(a => [a.latitude, a.longitude]);
             
             // Draw all trayek lines in hero map
             trayekData.forEach((trayek, index) => {
@@ -2125,11 +2138,20 @@
             mainCluster = makeCluster();
 
             assetData.forEach(a => {
-                if (!a.latitude || !a.longitude) return;
-                const mk = L.marker([a.latitude, a.longitude], {
-                    icon: makeIcon(STATUS_COLORS[a.status] || '#3b82f6', a.icon || 'fa-cube'),
-                    title: a.name,
-                });
+                if (!a.coordinates) return;
+                let mk;
+                if (a.geometry === 'polygon') {
+                    mk = L.polygon(a.coordinates, { color: a.color || '#3b82f6', weight: 3, fillColor: a.color || '#3b82f6', fillOpacity: 0.4 });
+                } else if (a.geometry === 'polyline') {
+                    mk = L.polyline(a.coordinates, { color: a.color || '#3b82f6', weight: 4 });
+                } else {
+                    let lat = a.coordinates[0];
+                    let lng = a.coordinates[1];
+                    mk = L.marker([lat, lng], {
+                        icon: makeIcon(STATUS_COLORS[a.status] || '#3b82f6', a.icon || 'fa-cube'),
+                        title: a.name,
+                    });
+                }
                 mk.bindPopup(makePopup(a), {
                     className: 'custom-popup',
                     maxWidth: 280
@@ -2229,7 +2251,11 @@
                     (!type || (a.type || '') === type);
                 if (ok) {
                     mainCluster.addLayer(mk);
-                    pts.push([a.latitude, a.longitude]);
+                    if (a.geometry === 'polygon' || a.geometry === 'polyline') {
+                        if(Array.isArray(a.coordinates)) a.coordinates.forEach(c => pts.push(c));
+                    } else if (Array.isArray(a.coordinates) && a.coordinates.length >= 2) {
+                        pts.push([a.coordinates[0], a.coordinates[1]]);
+                    }
                     n++;
                 }
             });

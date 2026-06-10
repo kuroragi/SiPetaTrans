@@ -53,7 +53,7 @@
             </div>
 
             <!-- Quick Info -->
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div class="bg-white bg-opacity-10 rounded-lg p-4">
                     <p class="text-blue-600 text-sm">No. Registrasi</p>
                     <p class="text-gray-500 text-2md font-bold">#{{ $asset->registration_number ?? '-' }}</p>
@@ -62,25 +62,52 @@
                     <p class="text-blue-600 text-sm">Jumlah Unit</p>
                     <p class="text-gray-500 text-2md font-bold">{{ $asset->quantity ?? 1 }}</p>
                 </div>
-                <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                    <p class="text-blue-600 text-sm">Tanggal Perolehan</p>
-                    <p class="text-gray-500 text-sm font-mono">
-                        {{ $asset->acquired_at ? date('d-m-Y', strtotime($asset->acquired_at)) : '' }}</p>
-                </div>
-                <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                    <p class="text-blue-600 text-sm">Nilai Perolehan</p>
-                    <p class="text-gray-500 text-sm font-mono">Rp
-                        {{ number_format($asset->acquisition_value, 0, ',', '.') }}</p>
-                </div>
-                <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                    <p class="text-blue-600 text-sm">Cara perolehan</p>
-                    <p class="text-gray-500 text-sm font-mono">{{ $asset->acquisition_source ?? '' }}</p>
-                </div>
-                <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                    <p class="text-blue-600 text-sm">Nilai Aset</p>
-                    <p class="text-gray-500 text-sm font-mono">Rp {{ number_format($asset->current_value, 0, ',', '.') }}
-                    </p>
-                </div>
+                @if($asset->type?->asset_category === 'parking_asset')
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Jenis Kendaraan</p>
+                        <p class="text-gray-500 text-sm font-bold">{{ $asset->vehicle_type ?? '-' }}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Kapasitas</p>
+                        <p class="text-gray-500 text-sm font-bold">
+                            @if($asset->vehicle_type === 'R2')
+                                R2: {{ $asset->r2 ?? 0 }}
+                            @elseif($asset->vehicle_type === 'R4')
+                                R4: {{ $asset->r4 ?? 0 }}
+                            @else
+                                R2: {{ $asset->r2 ?? 0 }} | R4: {{ $asset->r4 ?? 0 }}
+                            @endif
+                        </p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Jenis Tarif</p>
+                        <p class="text-gray-500 text-sm font-bold">{{ ucfirst($asset->tariff_type) ?? '-' }}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Pengelola</p>
+                        <p class="text-gray-500 text-sm font-bold">{{ $asset->manager ?? '-' }}</p>
+                    </div>
+                @else
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Tanggal Perolehan</p>
+                        <p class="text-gray-500 text-sm font-mono">
+                            {{ $asset->acquired_at ? date('d-m-Y', strtotime($asset->acquired_at)) : '' }}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Nilai Perolehan</p>
+                        <p class="text-gray-500 text-sm font-mono">Rp
+                            {{ number_format($asset->acquisition_value, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Cara perolehan</p>
+                        <p class="text-gray-500 text-sm font-mono">{{ $asset->acquisition_source ?? '' }}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-600 text-sm">Nilai Aset</p>
+                        <p class="text-gray-500 text-sm font-mono">Rp {{ number_format($asset->current_value, 0, ',', '.') }}
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -138,7 +165,7 @@
                             </p>
                         </div>
 
-                        @if ($asset->last_maintenance)
+                        @if ($asset->type?->asset_category !== 'parking_asset' && $asset->last_maintenance)
                             <div>
                                 <p class="text-sm text-gray-600 mb-1">Pemeliharaan Terakhir</p>
                                 <div class="flex items-center gap-2">
@@ -235,27 +262,55 @@
 
 @push('scripts')
     <script>
-        @if ($asset->latitude && $asset->longitude)
-            const map = L.map('map').setView([{{ $asset->latitude }}, {{ $asset->longitude }}], 15);
+        @if ($asset->latitude && $asset->longitude || ($asset->coordinates && count($asset->coordinates) > 0))
+            const geom = '{{ $asset->type?->geometry ?? 'point' }}';
+            const color = '{{ $asset->type?->color ?? '#3b82f6' }}';
+            const popupContent = `
+                <strong>{{ $asset->name }}</strong><br>
+                {{ $asset->location }}<br>
+                <small>{{ $asset->type?->name }}</small>
+            `;
+
+            let mapLat = {{ $asset->latitude ?? -6.2088 }};
+            let mapLng = {{ $asset->longitude ?? 106.8456 }};
+            
+            let coords = [];
+            @if(is_array($asset->coordinates))
+                coords = @json($asset->coordinates);
+            @elseif(is_string($asset->coordinates))
+                try { coords = JSON.parse(`{!! $asset->coordinates !!}`); } catch(e) {}
+            @endif
+
+            const map = L.map('map').setView([mapLat, mapLng], 15);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            const color = '{{ $asset->type?->color ?? '#3b82f6' }}';
-            L.circleMarker([{{ $asset->latitude }}, {{ $asset->longitude }}], {
-                radius: 12,
-                fillColor: color,
-                color: '#fff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(map).bindPopup(`
-            <strong>{{ $asset->name }}</strong><br>
-            {{ $asset->location }}<br>
-            <small>{{ $asset->type?->name }}</small>
-        `).openPopup();
+            if (geom === 'polygon' && coords.length >= 3) {
+                const polygon = L.polygon(coords, {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.5
+                }).addTo(map).bindPopup(popupContent).openPopup();
+                map.fitBounds(polygon.getBounds());
+            } else if (geom === 'polyline' && coords.length >= 2) {
+                const polyline = L.polyline(coords, {
+                    color: color,
+                    weight: 5
+                }).addTo(map).bindPopup(popupContent).openPopup();
+                map.fitBounds(polyline.getBounds());
+            } else {
+                L.circleMarker([mapLat, mapLng], {
+                    radius: 12,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 3,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(popupContent).openPopup();
+            }
         @endif
     </script>
 @endpush

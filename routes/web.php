@@ -89,3 +89,19 @@ Route::middleware('auth')->group(function () {
 Route::get('check-permission', function () {
     dd(auth()->user()->getAllPermissions()->pluck('name'));
 });
+
+// One-off route to migrate coordinates
+Route::get('/migrate-coordinates', function () {
+    $assets = \App\Models\Asset::whereNotNull('latitude')->whereNotNull('longitude')->get();
+    $count = 0;
+    foreach ($assets as $asset) {
+        // Parse into float with 6 decimal places
+        $lat = (float) number_format((float) ($asset->getRawOriginal('latitude') ?? $asset->latitude), 6, '.', '');
+        $lng = (float) number_format((float) ($asset->getRawOriginal('longitude') ?? $asset->longitude), 6, '.', '');
+        
+        $asset->coordinates = [$lat, $lng];
+        $asset->save();
+        $count++;
+    }
+    return response()->json(['message' => "Successfully migrated $count assets' coordinates with precision."]);
+});

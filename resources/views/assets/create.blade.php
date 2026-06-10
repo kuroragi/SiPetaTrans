@@ -61,6 +61,8 @@
                                 @foreach ($assetTypes as $type)
                                     <option value="{{ $type->id }}" data-icon="{{ $type->icon }}"
                                         data-color="{{ $type->color }}"
+                                        data-category="{{ $type->asset_category }}"
+                                        data-geometry="{{ $type->geometry }}"
                                         {{ old('asset_type_id') == $type->id ? 'selected' : '' }}
                                         data-subtypes='@json($type->subtypes)'>
                                         {{ $type->name }}
@@ -83,59 +85,92 @@
                             </select>
                         </div>
 
-                        <div>
+                        <div class="general-asset-field">
                             <label for="acquired_at" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Tanggal Perolehan <span class="text-red-500">*</span>
                             </label>
                             <input type="date" id="acquired_at" name="acquired_at" value="{{ old('acquired_at') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('acquired_at') border-red-500 @enderror"
-                                required>
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('acquired_at') border-red-500 @enderror">
                             @error('acquired_at')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                     {{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
+                        <div class="general-asset-field">
                             <label for="acquisition_value" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Nilai Perolehan <span class="text-red-500">*</span>
                             </label>
                             <input type="number" id="acquisition_value" name="acquisition_value"
                                 value="{{ old('acquisition_value') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('acquisition_value') border-red-500 @enderror"
-                                required>
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('acquisition_value') border-red-500 @enderror">
                             @error('acquisition_value')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                     {{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
+                        <div class="general-asset-field">
                             <label for="acquisition_source" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Cara Perolehan <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="acquisition_source" name="acquisition_source"
                                 value="{{ old('acquisition_source') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('acquisition_source') border-red-500 @enderror"
-                                required>
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('acquisition_source') border-red-500 @enderror">
                             @error('acquisition_source')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                     {{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
+                        <div class="general-asset-field">
                             <label for="current_value" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Nilai Aset <span class="text-red-500">*</span>
                             </label>
                             <input type="number" id="current_value" name="current_value"
                                 value="{{ old('current_value') }}"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('current_value') border-red-500 @enderror"
-                                required>
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('current_value') border-red-500 @enderror">
                             @error('current_value')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                     {{ $message }}</p>
                             @enderror
+                        </div>
+                    </div>
+
+                    <!-- Parking Asset Fields -->
+                    <div id="parking_asset_fields" style="display: none;">
+                        <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                            <i class="fas fa-parking text-blue-600"></i> Informasi Parkir
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="vehicle_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kendaraan</label>
+                                <select id="vehicle_type" name="vehicle_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateVehicleType()">
+                                    <option value="">-- Pilih Jenis --</option>
+                                    <option value="R2" {{ old('vehicle_type') == 'R2' ? 'selected' : '' }}>R2</option>
+                                    <option value="R4" {{ old('vehicle_type') == 'R4' ? 'selected' : '' }}>R4</option>
+                                    <option value="R2/R4" {{ old('vehicle_type') == 'R2/R4' ? 'selected' : '' }}>R2/R4</option>
+                                </select>
+                            </div>
+                            <div id="r2_field" style="display: none;">
+                                <label for="r2" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas R2</label>
+                                <input type="number" id="r2" name="r2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('r2') }}">
+                            </div>
+                            <div id="r4_field" style="display: none;">
+                                <label for="r4" class="block text-sm font-semibold text-gray-700 mb-2">Kapasitas R4</label>
+                                <input type="number" id="r4" name="r4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('r4') }}">
+                            </div>
+                            <div>
+                                <label for="tariff_type" class="block text-sm font-semibold text-gray-700 mb-2">Jenis Tarif</label>
+                                <select id="tariff_type" name="tariff_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="flat" {{ old('tariff_type') == 'flat' ? 'selected' : '' }}>Flat</option>
+                                    <option value="progresive" {{ old('tariff_type') == 'progresive' ? 'selected' : '' }}>Progresive</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="manager" class="block text-sm font-semibold text-gray-700 mb-2">Pengelola</label>
+                                <input type="text" id="manager" name="manager" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('manager') }}">
+                            </div>
                         </div>
                     </div>
 
@@ -159,13 +194,13 @@
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+                        <div class="general-asset-field">
                             <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Kondisi Aset <span class="text-red-500">*</span>
+                                Kondisi Aset
                             </label>
                             <select id="status" name="status"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('status') border-red-500 @enderror"
-                                required onchange="updateStatusPreview()">
+                                onchange="updateStatusPreview()">
                                 <option value="">-- Pilih Status --</option>
                                 <option value="baik" {{ old('status') == 'baik' ? 'selected' : '' }}>✅ Baik</option>
                                 <option value="perlu_perbaikan"
@@ -196,7 +231,7 @@
                             @enderror
                         </div>
 
-                        <div>
+                        <div class="general-asset-field">
                             <label for="last_maintenance" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Pemeliharaan Terakhir
                             </label>
@@ -209,7 +244,7 @@
                             @enderror
                         </div>
 
-                        <div>
+                        <div class="general-asset-field">
                             <label for="last_maintenance_photo" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Foto Pemeliharaan Terakhir
                             </label>
@@ -287,28 +322,27 @@
                     </h3>
 
                     <div class="mb-6">
+                        <input type="hidden" name="coordinates" id="coordinates" value="{{ old('coordinates') }}">
                         <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">
                             Alamat/Deskripsi Lokasi <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="location" name="location" value="{{ old('location') }}"
                             placeholder="Contoh: Jalan Jend. Sudirman No. 123, Bukittinggi"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('location') border-red-500 @enderror"
-                            required>
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('location') border-red-500 @enderror">
                         @error('location')
                             <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                 {{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="latlng_wrapper">
                         <div>
                             <label for="latitude" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Latitude <span class="text-red-500">*</span>
                             </label>
                             <input type="number" id="latitude" name="latitude" value="{{ old('latitude', -6.2088) }}"
                                 step="0.000001" placeholder="-6.2088"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('latitude') border-red-500 @enderror"
-                                required>
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('latitude') border-red-500 @enderror">
                             <p class="text-xs text-gray-500 mt-1">Default: Bukittinggi</p>
                             @error('latitude')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
@@ -322,8 +356,7 @@
                             </label>
                             <input type="number" id="longitude" name="longitude"
                                 value="{{ old('longitude', 106.8456) }}" step="0.000001" placeholder="106.8456"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('longitude') border-red-500 @enderror"
-                                required>
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('longitude') border-red-500 @enderror">
                             <p class="text-xs text-gray-500 mt-1">Default: Bukittinggi</p>
                             @error('longitude')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
@@ -389,11 +422,31 @@
 @endsection
 
 @push('scripts')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <script>
         // Asset types data
         const assetTypes = @json($assetTypes);
 
-        // Update category preview
+        function updateVehicleType() {
+            const vType = document.getElementById('vehicle_type').value;
+            const r2 = document.getElementById('r2_field');
+            const r4 = document.getElementById('r4_field');
+            if (vType === 'R2') {
+                r2.style.display = 'block';
+                r4.style.display = 'none';
+            } else if (vType === 'R4') {
+                r2.style.display = 'none';
+                r4.style.display = 'block';
+            } else if (vType === 'R2/R4') {
+                r2.style.display = 'block';
+                r4.style.display = 'block';
+            } else {
+                r2.style.display = 'none';
+                r4.style.display = 'none';
+            }
+        }
+
         function updateCategoryPreview() {
             const select = document.getElementById('asset_type_id');
             const selectedOption = select.options[select.selectedIndex];
@@ -403,13 +456,48 @@
                 return;
             }
 
-            const assetType = assetTypes.find(t => t.id == selectedOption.value);
+                const assetType = assetTypes.find(t => t.id == selectedOption.value);
             if (assetType) {
                 document.getElementById('categoryIcon').innerHTML = `<i class="fas ${assetType.icon}"></i>`;
                 document.getElementById('categoryIcon').style.color = assetType.color;
                 document.getElementById('categoryName').textContent = assetType.name;
                 document.getElementById('categoryDesc').textContent = assetType.description;
                 document.getElementById('categoryPreview').classList.remove('hidden');
+                
+                // Show/hide fields based on category
+                const isParking = assetType.asset_category === 'parking_asset';
+                document.querySelectorAll('.general-asset-field').forEach(el => {
+                    el.style.display = isParking ? 'none' : 'block';
+                });
+                document.getElementById('parking_asset_fields').style.display = isParking ? 'block' : 'none';
+                if(isParking) updateVehicleType();
+
+                // Show/hide lat/lng based on geometry
+                const isPolygon = assetType.geometry === 'polygon';
+                const isPolyline = assetType.geometry === 'polyline';
+                const isPoint = !isPolygon && !isPolyline;
+                document.getElementById('latlng_wrapper').style.display = isPoint ? 'grid' : 'none';
+
+                // Update Leaflet Draw tool based on geometry
+                if (drawControl && map) {
+                    map.removeControl(drawControl);
+                    const isPolygon = assetType.geometry === 'polygon';
+                    const isPolyline = assetType.geometry === 'polyline';
+                    const isPoint = !isPolygon && !isPolyline;
+
+                    drawControl = new L.Control.Draw({
+                        edit: { featureGroup: drawnItems },
+                        draw: {
+                            polygon: isPolygon,
+                            polyline: isPolyline,
+                            rectangle: false,
+                            circle: false,
+                            circlemarker: false,
+                            marker: isPoint
+                        }
+                    });
+                    map.addControl(drawControl);
+                }
             }
         }
 
@@ -467,6 +555,9 @@
         // Debounced geocoding with delay
         const debouncedGeocode = debounce(geocodeAddress, 1000);
 
+        let drawControl = null;
+        let drawnItems = new L.FeatureGroup();
+
         function initializeMap() {
             if (map) return;
 
@@ -479,24 +570,69 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            marker = L.marker([defaultLat, defaultLng]).addTo(map).bindPopup('Klik pada peta untuk menentukan lokasi aset');
+            map.addLayer(drawnItems);
+            
+            marker = L.marker([defaultLat, defaultLng]).bindPopup('Klik pada peta untuk menentukan lokasi aset');
+            drawnItems.addLayer(marker);
 
-            // Map click event - menambahkan marker baru dan update coordinates
+            // Configure draw control (we update options later based on geometry)
+            drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems
+                },
+                draw: {
+                    polygon: false,
+                    polyline: false,
+                    rectangle: false,
+                    circle: false,
+                    circlemarker: false,
+                    marker: true
+                }
+            });
+            map.addControl(drawControl);
+
+            map.on(L.Draw.Event.CREATED, function (event) {
+                const layer = event.layer;
+                const type = event.layerType;
+
+                drawnItems.clearLayers();
+                drawnItems.addLayer(layer);
+
+                let coords = [];
+                if (type === 'marker') {
+                    const latlng = layer.getLatLng();
+                    document.getElementById('latitude').value = latlng.lat.toFixed(6);
+                    document.getElementById('longitude').value = latlng.lng.toFixed(6);
+                    coords = [latlng.lat, latlng.lng];
+                } else if (type === 'polygon' || type === 'polyline') {
+                    const latlngs = layer.getLatLngs();
+                    // getLatLngs() returns nested array for polygon
+                    const flatLatLngs = type === 'polygon' ? latlngs[0] : latlngs;
+                    coords = flatLatLngs.map(ll => [ll.lat, ll.lng]);
+                    
+                    // set lat/lng to first point for fallback
+                    if (coords.length > 0) {
+                        document.getElementById('latitude').value = coords[0][0].toFixed(6);
+                        document.getElementById('longitude').value = coords[0][1].toFixed(6);
+                    }
+                }
+
+                document.getElementById('coordinates').value = JSON.stringify(coords);
+            });
+
+            // Fallback for marker click mapping if marker is used
             map.on('click', function(e) {
+                const geom = document.getElementById('asset_type_id').options[document.getElementById('asset_type_id').selectedIndex]?.dataset.geometry || 'point';
+                if (geom !== 'point') return;
+
                 const lat = e.latlng.lat;
                 const lng = e.latlng.lng;
 
-                // Update input fields
                 document.getElementById('latitude').value = lat.toFixed(6);
                 document.getElementById('longitude').value = lng.toFixed(6);
+                document.getElementById('coordinates').value = JSON.stringify([parseFloat(lat.toFixed(6)), parseFloat(lng.toFixed(6))]);
 
-                // Update marker position
                 updateMarkerPosition(lat, lng);
-
-                // Show popup
-                marker.setPopupContent(
-                    `<div class="text-sm"><strong>✓ Lokasi Dipilih:</strong><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}</div>`
-                ).openPopup();
             });
 
             // Update marker when coordinates change via input
@@ -517,10 +653,19 @@
         }
 
         function updateMarkerPosition(lat, lng) {
-            if (!map || !marker) return;
+            if (!map) return;
 
             map.setView([lat, lng], 13);
-            marker.setLatLng([lat, lng]);
+            
+            // Only update marker if it's a point geometry
+            const select = document.getElementById('asset_type_id');
+            const geom = select.options[select.selectedIndex]?.dataset.geometry || 'point';
+            
+            if (geom === 'point') {
+                drawnItems.clearLayers();
+                marker = L.marker([lat, lng]).bindPopup('Lokasi Aset');
+                drawnItems.addLayer(marker);
+            }
         }
 
         // Initialize on page load

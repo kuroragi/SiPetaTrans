@@ -77,14 +77,20 @@ class AssetController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
             'asset_type_id' => 'required|exists:asset_types,id',
             'asset_sub_type_id' => 'nullable|exists:asset_sub_types,id',
-            'acquired_at' => 'required',
-            'acquisition_value' => 'required',
-            'acquisition_source' => 'required',
-            'current_value' => 'required',
-            'status' => 'required|in:baik,perlu_perbaikan,rusak,dalam_pemeliharaan',
+            'acquired_at' => 'nullable',
+            'acquisition_value' => 'nullable',
+            'acquisition_source' => 'nullable',
+            'current_value' => 'nullable',
+            'status' => 'nullable|in:baik,perlu_perbaikan,rusak,dalam_pemeliharaan',
             'quantity' => 'nullable|integer|min:1',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'coordinates' => 'nullable|string',
+            'vehicle_type' => 'nullable|in:R2,R4,R2/R4',
+            'r2' => 'nullable|integer',
+            'r4' => 'nullable|integer',
+            'tariff_type' => 'nullable|in:flat,progresive',
+            'manager' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'last_maintenance' => 'nullable|date',
@@ -94,6 +100,10 @@ class AssetController extends Controller implements HasMiddleware
             'sub_assets.*.status' => 'required_with:sub_assets|in:baik,perlu_perbaikan,rusak',
             'sub_assets.*.photo' => 'nullable|image',
         ]);
+        
+        if (!empty($validated['coordinates'])) {
+            $validated['coordinates'] = json_decode($validated['coordinates'], true);
+        }
 
         $photoPath = null;
         $uploadedSubPhotos = [];
@@ -179,14 +189,20 @@ class AssetController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
             'asset_type_id' => 'required|exists:asset_types,id',
             'asset_sub_type_id' => 'nullable|exists:asset_sub_types,id',
-            'acquired_at' => 'required',
-            'acquisition_value' => 'required',
-            'acquisition_source' => 'required',
-            'current_value' => 'required',
-            'status' => 'required|in:baik,perlu_perbaikan,rusak,dalam_pemeliharaan',
+            'acquired_at' => 'nullable',
+            'acquisition_value' => 'nullable',
+            'acquisition_source' => 'nullable',
+            'current_value' => 'nullable',
+            'status' => 'nullable|in:baik,perlu_perbaikan,rusak,dalam_pemeliharaan',
             'quantity' => 'nullable|integer|min:1',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'coordinates' => 'nullable|string',
+            'vehicle_type' => 'nullable|in:R2,R4,R2/R4',
+            'r2' => 'nullable|integer',
+            'r4' => 'nullable|integer',
+            'tariff_type' => 'nullable|in:flat,progresive',
+            'manager' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'last_maintenance' => 'nullable|date',
@@ -197,6 +213,10 @@ class AssetController extends Controller implements HasMiddleware
             'sub_assets.*.status' => 'required_with:sub_assets|in:baik,perlu_perbaikan,rusak',
             'sub_assets.*.photo' => 'nullable|image',
         ]);
+        
+        if (!empty($validated['coordinates'])) {
+            $validated['coordinates'] = json_decode($validated['coordinates'], true);
+        }
 
         $photoPath = null;
         $uploadedSubPhotos = [];

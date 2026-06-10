@@ -20,17 +20,24 @@ class Asset extends Model
         'status',
         'latitude',
         'longitude',
+        'coordinates',
         'location',
         'last_maintenance',
         'last_maintenance_photo',
         'description',
         'quantity',
+        'vehicle_type',
+        'r2',
+        'r4',
+        'tariff_type',
+        'manager',
     ];
 
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
         'last_maintenance' => 'date',
+        'coordinates' => 'array',
     ];
 
     public function type(): BelongsTo
