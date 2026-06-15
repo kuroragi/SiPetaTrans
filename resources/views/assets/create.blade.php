@@ -505,6 +505,38 @@
                 document.getElementById('categoryDesc').textContent = assetType.description;
                 document.getElementById('categoryPreview').classList.remove('hidden');
 
+                // Subtypes logic
+                const subtypesRaw = selectedOption.getAttribute('data-subtypes');
+                let subtypes = [];
+                if (subtypesRaw) {
+                    try {
+                        subtypes = JSON.parse(subtypesRaw);
+                    } catch(e){}
+                }
+
+                const subtypeWrapper = document.getElementById('subtype-wrapper');
+                const subtypeSelect = document.getElementById('asset_sub_type_id');
+                const oldSubTypeId = '{{ old("asset_sub_type_id") }}';
+                
+                if (subtypes && subtypes.length > 0) {
+                    subtypeSelect.innerHTML = '<option value="">-- Pilih Sub Kategori Aset --</option>';
+                    subtypes.forEach(st => {
+                        const opt = document.createElement('option');
+                        opt.value = st.id;
+                        opt.textContent = st.name;
+                        if (oldSubTypeId == st.id) {
+                            opt.selected = true;
+                        }
+                        subtypeSelect.appendChild(opt);
+                    });
+                    subtypeWrapper.style.display = 'block';
+                    subtypeSelect.setAttribute('required', 'required');
+                } else {
+                    subtypeSelect.innerHTML = '<option value="">-- Pilih Sub Kategori Aset --</option>';
+                    subtypeWrapper.style.display = 'none';
+                    subtypeSelect.removeAttribute('required');
+                }
+
                 // Show/hide fields based on category
                 const isParking = assetType.asset_category === 'parking_asset';
                 document.querySelectorAll('.general-asset-field').forEach(el => {
@@ -696,6 +728,7 @@
             const lng = parseFloat(document.getElementById('longitude').value) || 106.8456;
 
             updateMarkerPosition(lat, lng);
+            document.getElementById('coordinates').value = JSON.stringify([lat, lng]);
         }
 
         function updateMarkerPosition(lat, lng) {
@@ -718,6 +751,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateCategoryPreview();
             initializeMap();
+
+            // Sync default lat/lng to coordinates field if empty
+            if (!document.getElementById('coordinates').value) {
+                updateMarkerFromInput();
+            }
 
             // Initialize sub assets based on quantity
             const qtyInput = document.getElementById('quantity');

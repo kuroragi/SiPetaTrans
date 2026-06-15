@@ -92,6 +92,13 @@
                         @endif
                     </a>
                     @endcan
+                    @can('view proposals')
+                    <a href="{{ route('proposals.index') }}"
+                        class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ Route::is('proposals.*') ? 'bg-blue-600' : 'hover:bg-blue-700' }} transition">
+                        <i class="fas fa-bullhorn w-5"></i>
+                        <span>Usulan Masyarakat</span>
+                    </a>
+                    @endcan
                     @can('view reports')
                     <a href="{{ route('reports.index') }}"
                         class="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">

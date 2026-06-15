@@ -362,6 +362,36 @@
             resize: vertical;
         }
 
+        /* Usulan Light Form */
+        .usulan-input {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #0f172a;
+            font-size: 13px;
+            outline: none;
+            transition: all .25s;
+        }
+        .usulan-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, .15);
+        }
+        .usulan-input option {
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .usulan-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
         /* upload */
         .upload-zone {
             border: 2px dashed var(--bd);
@@ -1700,6 +1730,228 @@
     <div class="sec-divider"></div>
 
     {{-- ======================================================
+     USULAN MASYARAKAT FORM
+====================================================== --}}
+    <section id="fitur" style="padding:80px 0;background:#07101f;position:relative;">
+        <div class="grid-bg" style="position:absolute;inset:0;opacity:.14;"></div>
+        <div style="max-width:1280px;margin:0 auto;padding:0 24px;position:relative;z-index:10;">
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;"
+                class="grid grid-cols-1 lg:grid-cols-2 gap-14">
+
+                {{-- LEFT --}}
+                <div class="reveal">
+                    <div class="sec-badge"><i class="fas fa-lightbulb" style="color:#fbbf24;"></i> Usulan Pembangunan
+                    </div>
+                    <h2 style="font-size:clamp(1.8rem,3vw,2.5rem);font-weight:900;color:#fff;line-height:1.15;">
+                        Sampaikan Usulan Anda,<br>
+                        <span style="color:#fbbf24;">Bangun Kota Bersama</span>
+                    </h2>
+                    <p style="color:#fff;font-size:13.5px;line-height:1.75;margin:20px 0 32px;">
+                        Punya usulan penambahan rambu, marka, atau fasilitas transportasi lainnya? Sampaikan
+                        usulan Anda beserta surat permohonan agar kami dapat menindaklanjutinya demi keselamatan
+                        dan kenyamanan bersama.
+                    </p>
+
+                    <div style="display:flex;flex-direction:column;gap:18px;margin-bottom:36px;">
+                        @foreach ([['01', 'fa-file-pen', '#fbbf24', 'Isi Data Pengusul', 'Masukkan nama instansi/perorangan, email aktif, jenis permintaan, dan lokasi yang diusulkan.'], ['02', 'fa-file-pdf', '#f87171', 'Lampirkan Surat Resmi', 'Upload arsip surat permohonan dalam format PDF (maks. 2MB) sebagai dokumen pendukung.'], ['03', 'fa-circle-check', '#4ade80', 'Usulan Diproses', 'Usulan masuk ke sistem dan petugas Dinas Perhubungan akan menindaklanjuti sesuai anggaran.']] as $step)
+                            <div style="display:flex;align-items:flex-start;gap:16px;" class="reveal">
+                                <div
+                                    style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;background:{{ $step[2] }}14;border:1px solid {{ $step[2] }}28;color:{{ $step[2] }};">
+                                    {{ $step[0] }}</div>
+                                <div>
+                                    <div class="tw"
+                                        style="color:#fff;font-weight:700;font-size:13.5px;margin-bottom:4px;">
+                                        {{ $step[3] }}</div>
+                                    <div style="color:#64748b;font-size:12.5px;line-height:1.6;">{{ $step[4] }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                        @foreach ([['fa-shield-halved', '#4ade80', 'Data aman & terlindungi'], ['fa-bolt', '#fbbf24', 'Ditindaklanjuti resmi'], ['fa-lock-open', '#60a5fa', 'Tanpa perlu login']] as $b)
+                            <div class="glass"
+                                style="border-radius:10px;padding:8px 14px;display:inline-flex;align-items:center;gap:7px;font-size:11px;color:#94a3b8;">
+                                <i class="fas {{ $b[0] }}" style="color:{{ $b[1] }};"></i>
+                                {{ $b[2] }}
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- RIGHT — form --}}
+                <div class="reveal reveal-delay-2">
+
+                    @if (session('usulan_success'))
+                        <div
+                            style="margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;padding:18px;border-radius:14px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.22);">
+                            <i class="fas fa-circle-check"
+                                style="color:#4ade80;font-size:20px;margin-top:1px;flex-shrink:0;"></i>
+                            <div>
+                                <div style="font-weight:700;color:#4ade80;font-size:14px;">Usulan Berhasil Dikirim!
+                                </div>
+                                <div style="color:#94a3b8;font-size:12px;margin-top:4px;">{{ session('usulan_success') }}
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div
+                            style="margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;padding:18px;border-radius:14px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);">
+                            <i class="fas fa-circle-exclamation"
+                                style="color:#f87171;font-size:20px;margin-top:1px;flex-shrink:0;"></i>
+                            <ul
+                                style="list-style:disc;padding-left:16px;color:#94a3b8;font-size:12px;line-height:1.8;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div id="form-card-usulan"
+                        style="border-radius:20px;overflow:hidden;background:#f8fafc;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(0,0,0,.15);">
+                        {{-- form header --}}
+                        <div id="form-card-usulan-header"
+                            style="padding:20px 24px;background:linear-gradient(135deg,#ffffff,#f1f5f9);border-bottom:1px solid #e2e8f0;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div
+                                    style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);">
+                                    <i class="fas fa-file-signature" style="color:#f59e0b;font-size:16px;"></i>
+                                </div>
+                                <div>
+                                    <div style="color:#0f172a;font-weight:700;font-size:14px;">Form Usulan
+                                        Masyarakat</div>
+                                    <div style="color:#64748b;font-size:11px;margin-top:2px;">Publik · Resmi · Tanpa
+                                        akun</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{{ route('proposals.store-public') }}"
+                            enctype="multipart/form-data"
+                            style="padding:24px;display:flex;flex-direction:column;gap:16px;">
+                            @csrf
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div>
+                                    <label class="usulan-label">Nama Pengusul <span
+                                            style="color:#ef4444;">*</span></label>
+                                    <input type="text" name="pengusul" value="{{ old('pengusul') }}"
+                                        placeholder="Instansi / perorangan" required class="usulan-input" />
+                                </div>
+                                <div>
+                                    <label class="usulan-label">Email Pengusul <span
+                                            style="color:#ef4444;">*</span></label>
+                                    <input type="email" name="email_pengusul"
+                                        value="{{ old('email_pengusul') }}" placeholder="Alamat email aktif"
+                                        required class="usulan-input" />
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div>
+                                    <label class="usulan-label">Tanggal Pengajuan <span
+                                            style="color:#ef4444;">*</span></label>
+                                    <input type="date" name="tanggal"
+                                        value="{{ old('tanggal', date('Y-m-d')) }}" required
+                                        class="usulan-input" />
+                                </div>
+                                <div>
+                                    <label class="usulan-label">Jumlah <span style="color:#ef4444;">*</span></label>
+                                    <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}" min="1" required class="usulan-input" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="usulan-label">Jenis Permintaan <span style="color:#ef4444;">*</span></label>
+                                <select name="jenis_permintaan_select" class="usulan-input" onchange="toggleLainnya(this)">
+                                    <option value="rambu">Rambu</option>
+                                    <option value="rubber speed bump">Rubber Speed Bump</option>
+                                    <option value="pita kejut">Pita Kejut</option>
+                                    <option value="cermin tikung">Cermin Tikung</option>
+                                    <option value="lainnya">Lainnya...</option>
+                                </select>
+                                <input type="hidden" name="jenis_permintaan" id="jenis_permintaan" value="{{ old('jenis_permintaan', 'rambu') }}" />
+                                <input type="text" id="jenis_permintaan_lainnya" class="usulan-input" placeholder="Sebutkan jenis permintaan lainnya..." style="display:none;margin-top:8px;" oninput="document.getElementById('jenis_permintaan').value = this.value;" />
+                            </div>
+
+                            <div>
+                                <label class="usulan-label">Lokasi Usulan <span style="color:#ef4444;">*</span></label>
+                                <div style="position:relative;">
+                                    <i class="fas fa-location-dot" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:12px;"></i>
+                                    <input type="text" name="lokasi" value="{{ old('lokasi') }}" placeholder="Nama jalan / area / titik lokasi..." required class="usulan-input" style="padding-left:32px;" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="usulan-label">Pilih Koordinat di Peta <span style="color:#64748b;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
+                                <div id="usulan-map" style="height:180px;border-radius:12px;border:1px solid #cbd5e1;overflow:hidden;z-index:1;"></div>
+                                <input type="hidden" name="coordinates[0]" id="usulan_lat" value="{{ old('coordinates.0') }}" />
+                                <input type="hidden" name="coordinates[1]" id="usulan_lng" value="{{ old('coordinates.1') }}" />
+                                <p style="font-size:11px;color:#64748b;margin-top:5px;display:flex;align-items:center;gap:5px;"><i class="fas fa-circle-info" style="color:#0ea5e9;"></i> Klik pada peta untuk menentukan titik lokasi presisi.</p>
+                            </div>
+
+                            <div>
+                                <label class="field-label">Perkiraan Anggaran <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
+                                <div style="position:relative;">
+                                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#475569;font-size:12px;font-weight:600;">Rp</span>
+                                    <input type="number" name="perkiraan_anggaran" value="{{ old('perkiraan_anggaran') }}" placeholder="Contoh: 1500000" class="field-input" style="padding-left:36px;" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="field-label">Arsip Surat Permohonan (PDF) <span style="color:#f87171;">*</span></label>
+                                <div id="pdf-upload-zone" class="upload-zone" onclick="document.getElementById('arsip-input').click()">
+                                    <i id="pdf-upload-icon" class="fas fa-file-pdf" style="color:#334155;font-size:28px;margin-bottom:8px;display:block;"></i>
+                                    <p id="pdf-upload-text" style="font-size:13px;font-weight:600;color:#64748b;">Klik untuk upload surat PDF</p>
+                                    <p id="pdf-upload-hint" style="font-size:11px;color:#334155;margin-top:4px;">PDF &mdash; maksimal 2 MB</p>
+                                </div>
+                                <input id="arsip-input" type="file" name="arsip_surat" accept=".pdf" required style="display:none;" onchange="handlePdfChange(this)" />
+                            </div>
+
+                            <div>
+                                <label class="field-label">Foto Dokumentasi Lokasi <span style="color:#f87171;">*</span></label>
+                                <div id="usulan-upload-zone" class="upload-zone" onclick="document.getElementById('usulan-foto-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleUsulanDrop(event)">
+                                    <i id="usulan-upload-icon" class="fas fa-cloud-arrow-up" style="color:#334155;font-size:32px;margin-bottom:8px;display:block;"></i>
+                                    <p id="usulan-upload-text" style="font-size:13px;font-weight:600;color:#64748b;">Klik atau drag &amp; drop foto di sini</p>
+                                    <p id="usulan-upload-hint" style="font-size:11px;color:#334155;margin-top:4px;">JPG, PNG &mdash; maksimal 5 MB</p>
+                                </div>
+                                <input id="usulan-foto-input" type="file" name="foto" accept="image/*" required style="display:none;" onchange="handleUsulanFileChange(this)" />
+                                <div id="usulan-img-preview" style="display:none;margin-top:10px;position:relative;">
+                                    <img id="usulan-preview-img" src="" alt="preview" style="width:100%;border-radius:12px;object-fit:cover;max-height:160px;" />
+                                    <button type="button" onclick="clearUsulanFile()" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(239,68,68,.85);color:#fff;font-size:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="field-label">Tindak Lanjut yang Diharapkan <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
+                                <textarea name="tindak_lanjut" rows="2" placeholder="Jelaskan tindak lanjut yang diharapkan..." class="field-input">{{ old('tindak_lanjut') }}</textarea>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:13px 24px;font-size:14px;background:linear-gradient(135deg,#d97706,#f59e0b);box-shadow:0 0 20px rgba(245,158,11,.3);">
+                                <i class="fas fa-paper-plane"></i> Kirim Usulan Sekarang
+                            </button>
+
+                            <p style="text-align:center;font-size:11.5px;color:#334155;">
+                                <i class="fas fa-shield-halved" style="color:#4ade80;margin-right:4px;"></i>
+                                Data Anda dijaga dan hanya digunakan untuk keperluan pelayanan publik.
+                            </p>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    </section>
+
+    <div class="sec-divider"></div>
+
+    {{-- ======================================================
      ALUR PENANGANAN
 ====================================================== --}}
     <section id="alur-sec" style="padding:72px 0;background:#07101f;">
@@ -2312,6 +2564,100 @@
             document.getElementById('upload-text').textContent = 'Klik atau drag & drop foto di sini';
             document.getElementById('upload-hint').textContent = 'JPG, PNG — maksimal 5 MB';
             document.getElementById('img-preview').style.display = 'none';
+        }
+
+        // ---- Usulan Masyarakat Form ----
+        function toggleLainnya(select) {
+            const lainnyaInput = document.getElementById('jenis_permintaan_lainnya');
+            const hiddenInput = document.getElementById('jenis_permintaan');
+            if (select.value === 'lainnya') {
+                lainnyaInput.style.display = 'block';
+                lainnyaInput.required = true;
+                hiddenInput.value = lainnyaInput.value;
+            } else {
+                lainnyaInput.style.display = 'none';
+                lainnyaInput.required = false;
+                hiddenInput.value = select.value;
+            }
+        }
+
+        function initUsulanMap() {
+            const mapEl = document.getElementById('usulan-map');
+            if (!mapEl) return;
+            
+            let usulanMap = L.map('usulan-map').setView([-0.305, 100.369], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(usulanMap);
+
+            let usulanMarker;
+
+            usulanMap.on('click', function(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+                
+                document.getElementById('usulan_lat').value = lat;
+                document.getElementById('usulan_lng').value = lng;
+                
+                if (usulanMarker) {
+                    usulanMarker.setLatLng(e.latlng);
+                } else {
+                    usulanMarker = L.marker(e.latlng).addTo(usulanMap);
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initUsulanMap);
+
+        // ---- Usulan: PDF Upload ----
+        function handlePdfChange(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const zone = document.getElementById('pdf-upload-zone');
+            zone.classList.add('has-file');
+            document.getElementById('pdf-upload-icon').style.color = '#ef4444';
+            document.getElementById('pdf-upload-text').textContent = file.name;
+            document.getElementById('pdf-upload-hint').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+        }
+
+        // ---- Usulan: Foto Upload ----
+        function handleUsulanFileChange(input) {
+            const file = input.files[0];
+            if (!file) return;
+            applyUsulanFile(file);
+        }
+
+        function handleUsulanDrop(e) {
+            e.preventDefault();
+            document.getElementById('usulan-upload-zone').classList.remove('drag-over');
+            const f = e.dataTransfer.files[0];
+            if (!f) return;
+            document.getElementById('usulan-foto-input').files = e.dataTransfer.files;
+            applyUsulanFile(f);
+        }
+
+        function applyUsulanFile(file) {
+            const zone = document.getElementById('usulan-upload-zone');
+            zone.classList.add('has-file');
+            document.getElementById('usulan-upload-icon').style.color = '#22c55e';
+            document.getElementById('usulan-upload-text').textContent = file.name;
+            document.getElementById('usulan-upload-hint').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('usulan-preview-img').src = e.target.result;
+                document.getElementById('usulan-img-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearUsulanFile() {
+            document.getElementById('usulan-foto-input').value = '';
+            const zone = document.getElementById('usulan-upload-zone');
+            zone.classList.remove('has-file');
+            document.getElementById('usulan-upload-icon').style.color = '#334155';
+            document.getElementById('usulan-upload-text').textContent = 'Klik atau drag & drop foto di sini';
+            document.getElementById('usulan-upload-hint').textContent = 'JPG, PNG — maksimal 5 MB';
+            document.getElementById('usulan-img-preview').style.display = 'none';
         }
 
         // ---- Navbar scroll ----

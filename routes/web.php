@@ -12,6 +12,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\AssetDepreciationController;
 use App\Http\Controllers\TrayekController;
 use App\Mail\AssetReportMail;
@@ -27,6 +28,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::post('/pengaduan-kerusakan', [DamageReportController::class, 'storePublic'])->name('damage-reports.store-public');
+Route::post('/usulan-masyarakat', [ProposalController::class, 'storePublic'])->name('proposals.store-public');
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
@@ -65,6 +67,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [DamageReportController::class, 'index'])->name('index');
         Route::get('/{damageReport}', [DamageReportController::class, 'show'])->name('show');
         Route::put('/{damageReport}', [DamageReportController::class, 'update'])->name('update');
+    });
+
+    // Proposals Routes
+    Route::prefix('proposals')->name('proposals.')->group(function () {
+        Route::get('/', [ProposalController::class, 'index'])->name('index');
+        Route::get('/{proposal}', [ProposalController::class, 'show'])->name('show');
+        Route::put('/{proposal}/status', [ProposalController::class, 'updateStatus'])->name('update-status');
+        Route::post('/{proposal}/complete', [ProposalController::class, 'markCompleted'])->name('mark-completed');
     });
 
     // Users
