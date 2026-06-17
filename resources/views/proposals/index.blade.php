@@ -35,10 +35,15 @@
 
     <!-- Proposals List -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="p-6 border-b border-gray-200">
+        <div class="p-6 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
                 <i class="fas fa-list text-blue-500"></i> Daftar Usulan Masyarakat
             </h3>
+            @can('create proposals')
+            <a href="{{ route('proposals.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 text-sm font-semibold">
+                <i class="fas fa-plus"></i> Tambah Data Lama
+            </a>
+            @endcan
         </div>
 
         <div class="overflow-x-auto">

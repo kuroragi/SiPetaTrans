@@ -17,6 +17,7 @@ class ProposalController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:view proposals', only: ['index', 'show']),
+            new Middleware('permission:create proposals', only: ['create', 'store']),
             new Middleware('permission:edit proposals', only: ['edit', 'updateStatus', 'markCompleted']),
             new Middleware('permission:delete proposals', only: ['destroy']),
         ];
@@ -47,6 +48,46 @@ class ProposalController extends Controller implements HasMiddleware
         return back()->with('success', 'Usulan berhasil dikirim. Terima kasih!');
     }
 
+    public function create()
+    {
+        $assetTypes = AssetType::with('subtypes')->get();
+        return view('proposals.create', compact('assetTypes'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'pengusul' => 'required|string|max:255',
+            'email_pengusul' => 'required|email|max:255',
+            'tanggal' => 'required|date',
+            'jenis_permintaan' => 'required|string|max:255',
+            'jumlah' => 'required|integer|min:1',
+            'lokasi' => 'required|string',
+            'coordinates' => 'nullable|json',
+            'perkiraan_anggaran' => 'nullable|integer',
+            'foto' => 'required|image|max:5120',
+            'arsip_surat' => 'required|mimes:pdf|max:2048',
+            'tindak_lanjut' => 'nullable|string',
+            'kelayakan' => 'required|in:layak,tidak layak',
+            'status' => 'required|in:ditindak lanjuti,selesai,ditolak',
+        ]);
+
+        if ($validated['kelayakan'] === 'tidak layak') {
+            $validated['status'] = 'ditolak';
+        }
+
+        if (isset($validated['coordinates'])) {
+            $validated['coordinates'] = json_decode($validated['coordinates'], true);
+        }
+
+        $validated['foto'] = $request->file('foto')->store('proposals/foto', 'public');
+        $validated['arsip_surat'] = $request->file('arsip_surat')->store('proposals/surat', 'public');
+        
+        Proposal::create($validated);
+
+        return redirect()->route('proposals.index')->with('success', 'Data usulan lama berhasil ditambahkan.');
+    }
+
     public function index()
     {
         $proposals = Proposal::latest()->paginate(15);
@@ -66,14 +107,14 @@ class ProposalController extends Controller implements HasMiddleware
     {
         return view('proposals.show', [
             'proposal' => $proposal,
-            'statusOptions' => ['pending', 'ditindak lanjuti', 'ditolak'],
+            'statusOptions' => ['pending', 'ditindak lanjuti', 'ditolak', 'selesai'],
         ]);
     }
 
     public function updateStatus(Request $request, Proposal $proposal)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,ditindak lanjuti,ditolak',
+            'status' => 'required|in:pending,ditindak lanjuti,ditolak,selesai',
             'keterangan_admin' => 'nullable|string',
         ]);
 

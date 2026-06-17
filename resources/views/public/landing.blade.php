@@ -1927,11 +1927,6 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="field-label">Tindak Lanjut yang Diharapkan <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
-                                <textarea name="tindak_lanjut" rows="2" placeholder="Jelaskan tindak lanjut yang diharapkan..." class="field-input">{{ old('tindak_lanjut') }}</textarea>
-                            </div>
-
                             <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:13px 24px;font-size:14px;background:linear-gradient(135deg,#d97706,#f59e0b);box-shadow:0 0 20px rgba(245,158,11,.3);">
                                 <i class="fas fa-paper-plane"></i> Kirim Usulan Sekarang
                             </button>

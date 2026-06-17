@@ -72,6 +72,8 @@ Route::middleware('auth')->group(function () {
     // Proposals Routes
     Route::prefix('proposals')->name('proposals.')->group(function () {
         Route::get('/', [ProposalController::class, 'index'])->name('index');
+        Route::get('/create', [ProposalController::class, 'create'])->name('create');
+        Route::post('/', [ProposalController::class, 'store'])->name('store');
         Route::get('/{proposal}', [ProposalController::class, 'show'])->name('show');
         Route::put('/{proposal}/status', [ProposalController::class, 'updateStatus'])->name('update-status');
         Route::post('/{proposal}/complete', [ProposalController::class, 'markCompleted'])->name('mark-completed');
