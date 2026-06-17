@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\Proposal;
 use Illuminate\Http\Request;
 
 use App\Models\AssetType;
@@ -38,6 +39,36 @@ class ReportController extends Controller implements HasMiddleware
 
         if($request->type === 'asset'){
             return $this->print_asset($request->date, $request->format, $request->assetType, $request->status);
+        } else if ($request->type === 'proposal') {
+            return $this->print_proposal($request->date, $request->format, $request->status);
+        }
+    }
+
+    protected function print_proposal($date, $format, $status){
+        $targetDate = Carbon::parse($date)->endOfDay();
+        
+        $query = Proposal::where('tanggal', '<=', $targetDate);
+        if ($status) {
+            $query->where('status', $status);
+        }
+        
+        $proposals = $query->get();
+
+        if ($format === 'pdf') {
+            $pdf = Pdf::loadView('pdf.proposal', [
+                'proposals' => $proposals
+            ]);
+            $pdf->setPaper([0, 0, 612.283, 935.433], 'landscape');
+            return $pdf->stream('Laporan_Usulan.pdf');
+        } else {
+            // Excel
+            $html = view('pdf.proposal', [
+                'proposals' => $proposals
+            ])->render();
+            
+            return response($html)
+                ->header('Content-Type', 'application/vnd.ms-excel')
+                ->header('Content-Disposition', 'attachment; filename="Laporan_Usulan.xls"');
         }
     }
 
