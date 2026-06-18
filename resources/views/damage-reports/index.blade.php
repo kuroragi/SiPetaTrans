@@ -11,7 +11,7 @@
         </div>
         <div class="bg-white rounded-lg shadow p-4 border">
             <p class="text-sm text-gray-600">Dalam Proses</p>
-            <p class="text-2xl font-bold text-gray-800">{{ $counts['dalam_proses'] ?? 0 }}</p>
+            <p class="text-2xl font-bold text-gray-800">{{ $counts['ditindak_lanjuti'] ?? 0 }}</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4 border">
             <p class="text-sm text-gray-600">Selesai</p>
