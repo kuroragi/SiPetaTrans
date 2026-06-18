@@ -32,7 +32,48 @@
                 <p class="text-3xl font-bold text-gray-800 mt-2">
                     {{ $assets->filter(fn($a) => $a->monitorings->count() === 0)->count() }}</p>
             </div>
-        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="mb-6 bg-white rounded-lg shadow p-4 border">
+        <form method="GET" action="{{ route('asset-monitoring.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Aset</label>
+                <input type="text" name="name" id="name" value="{{ request('name') }}" placeholder="Cari nama aset..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+            <div>
+                <label for="asset_type_id" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                <select name="asset_type_id" id="asset_type_id"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <option value="">Semua Kategori</option>
+                    @foreach ($assetTypes as $type)
+                        <option value="{{ $type->id }}" @selected(request('asset_type_id') == $type->id)>{{ $type->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select name="status" id="status"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    <option value="">Semua Status</option>
+                    <option value="baik" @selected(request('status') == 'baik')>Baik</option>
+                    <option value="perlu_perbaikan" @selected(request('status') == 'perlu_perbaikan')>Perlu Perbaikan</option>
+                    <option value="rusak" @selected(request('status') == 'rusak')>Rusak</option>
+                    <option value="dalam_pemeliharaan" @selected(request('status') == 'dalam_pemeliharaan')>Dalam Pemeliharaan</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                    <i class="fas fa-filter mr-1"></i> Filter
+                </button>
+                @if(request()->anyFilled(['name', 'asset_type_id', 'status']))
+                    <a href="{{ route('asset-monitoring.index') }}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium text-center flex items-center justify-center">
+                        Reset
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
 
     <!-- Assets List -->

@@ -17,6 +17,8 @@ class DamageReport extends Model
         'status',
         'seen',
         'forwarded_at',
+        'foto_selesai',
+        'tanggal_selesai',
     ];
 
     public function asset(): BelongsTo

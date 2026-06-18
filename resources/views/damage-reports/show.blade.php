@@ -76,7 +76,7 @@
                     </div>
                 @endif
 
-                @if(empty($report->forwarded_at))
+                @if($report->status === 'baru')
 
                     <form method="POST" action="{{ route('damage-reports.update', $report) }}" class="space-y-4">
                         @csrf
@@ -113,12 +113,60 @@
                         </button>
                     </form>
 
-                @else
+                @elseif($report->status === 'ditindak_lanjuti')
 
                     <div class="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800">
-                        <i class="fas fa-info-circle mr-1"></i> pengaduan telah ditindak lanjuti.
+                        <i class="fas fa-info-circle mr-1"></i> Pengaduan telah ditindak lanjuti. Selesaikan pengaduan dengan bukti perbaikan di bawah.
                     </div>
-                
+
+                    <form method="POST" action="{{ route('damage-reports.update', $report) }}" enctype="multipart/form-data" class="space-y-4 mt-4">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="status" value="selesai">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Foto Bukti Selesai</label>
+                            <input type="file" name="foto_selesai" accept="image/*" required
+                                class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tanggal Selesai Perbaikan</label>
+                            <input type="date" name="tanggal_selesai" required value="{{ old('tanggal_selesai', date('Y-m-d')) }}"
+                                class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+
+                        <button type="submit"
+                            class="w-full px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition font-semibold"
+                            onclick="return confirm('Apakah Anda yakin ingin menyelesaikan laporan ini? Setelah selesai, laporan tidak dapat diubah lagi.')">
+                            Selesaikan Laporan
+                        </button>
+                    </form>
+
+                @elseif($report->status === 'selesai')
+
+                    <div class="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i> Laporan telah selesai diperbaiki dan ditutup.
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Tanggal Selesai</p>
+                            <p class="font-semibold text-gray-800">
+                                {{ $report->tanggal_selesai ? \Carbon\Carbon::parse($report->tanggal_selesai)->format('d/m/Y') : '-' }}
+                            </p>
+                        </div>
+                        @if($report->foto_selesai)
+                        <div>
+                            <p class="text-sm text-gray-600 mb-2">Foto Bukti Selesai</p>
+                            <div class="bg-gray-50 border rounded-lg p-3">
+                                <img src="{{ asset('storage/' . $report->foto_selesai) }}" alt="Foto bukti selesai"
+                                    class="max-h-[300px] w-auto rounded" />
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+
                 @endif
 
                 <div class="mt-6">

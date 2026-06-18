@@ -70,24 +70,44 @@ class DamageReportController extends Controller implements HasMiddleware
 
         $damageReport->load(['asset.type']);
 
+        $statusOptions = $damageReport->status === 'baru' 
+            ? ['baru', 'ditindak_lanjuti'] 
+            : ['ditindak_lanjuti', 'selesai'];
+
         return view('damage-reports.show', [
             'report' => $damageReport,
             'assets' => Asset::orderBy('name')->get(['id', 'name']),
-            'statusOptions' => ['baru', 'ditindak_lanjuti', 'selesai'],
+            'statusOptions' => $statusOptions,
         ]);
     }
 
     public function update(Request $request, DamageReport $damageReport)
     {
+        if ($damageReport->status === 'selesai') {
+            return back()->withErrors('Laporan yang sudah selesai tidak dapat diubah lagi.');
+        }
+
         $validated = $request->validate([
             'status' => ['required', 'in:baru,ditindak_lanjuti,selesai'],
             'asset_id' => ['nullable', 'integer', 'exists:assets,id'],
+            'foto_selesai' => ['nullable', 'required_if:status,selesai', 'image', 'max:5120'],
+            'tanggal_selesai' => ['nullable', 'required_if:status,selesai', 'date'],
         ]);
 
         try {
             DB::transaction(function () use ($validated, $damageReport, $request) {
                 $oldStatus = $damageReport->status;
-                $validated['forwarded_at'] = now();
+
+                if ($validated['status'] === 'ditindak_lanjuti' && $oldStatus !== 'ditindak_lanjuti') {
+                    $validated['forwarded_at'] = now();
+                }
+
+                if ($validated['status'] === 'selesai') {
+                    if ($request->hasFile('foto_selesai')) {
+                        $validated['foto_selesai'] = $request->file('foto_selesai')->store('damage-reports', 'public');
+                    }
+                }
+
                 $damageReport->update($validated);
 
                 // Insert into AssetMonitoring when status changes to 'ditindak_lanjuti'

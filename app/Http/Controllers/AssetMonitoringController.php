@@ -23,16 +23,33 @@ class AssetMonitoringController extends Controller implements HasMiddleware
     /**
      * List all assets for monitoring
      */
-    public function index()
+    public function index(Request $request)
     {
-        $assets = Asset::with(['type', 'monitorings' => function($query) {
+        $query = Asset::query();
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->input('name') . '%');
+        }
+
+        if ($request->filled('asset_type_id')) {
+            $query->where('asset_type_id', $request->input('asset_type_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $assets = $query->with(['type', 'monitorings' => function($query) {
             $query->latest('photo_date')->limit(1);
         }, 'maintenance' => function($query) {
             $query->latest('start_date')->limit(1);
         }])->get();
 
+        $assetTypes = \App\Models\AssetType::orderBy('name')->get();
+
         return view('asset-monitoring.index', [
             'assets' => $assets,
+            'assetTypes' => $assetTypes,
         ]);
     }
 

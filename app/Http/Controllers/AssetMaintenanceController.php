@@ -77,10 +77,14 @@ class AssetMaintenanceController extends Controller implements HasMiddleware
                 'description' => $validated['description']
             ]);
 
+            $firstPhotoPath = null;
             if ($validated['maintenance_type'] === 'perbaikan' && $validated['status'] === 'selesai') {
                 if ($request->hasFile('photos')) {
                     foreach ($request->file('photos') as $photo) {
                         $path = $photo->store('asset-photos', 'public');
+                        if (!$firstPhotoPath) {
+                            $firstPhotoPath = $path;
+                        }
                         
                         \App\Models\AssetMonitoring::create([
                             'asset_id' => $validated['asset_id'],
@@ -91,6 +95,32 @@ class AssetMaintenanceController extends Controller implements HasMiddleware
                             'captured_by' => auth()->user()->name ?? 'System',
                         ]);
                     }
+                }
+            }
+
+            // Update Asset status and last_maintenance if maintenance is selesai
+            if ($validated['status'] === 'selesai') {
+                $asset = \App\Models\Asset::find($validated['asset_id']);
+                if ($asset) {
+                    $asset->update([
+                        'status' => $validated['condition_after'] ?? $asset->status,
+                        'last_maintenance' => $validated['end_date'] ?: now(),
+                    ]);
+                }
+            }
+
+            // Sync with DamageReport if perbaikan completed with 'baik' condition
+            if ($validated['maintenance_type'] === 'perbaikan' && $validated['status'] === 'selesai' && ($validated['condition_after'] ?? null) === 'baik') {
+                $latestReport = \App\Models\DamageReport::where('asset_id', $validated['asset_id'])
+                    ->where('status', 'ditindak_lanjuti')
+                    ->latest()
+                    ->first();
+                if ($latestReport) {
+                    $latestReport->update([
+                        'status' => 'selesai',
+                        'foto_selesai' => $firstPhotoPath ?: $latestReport->foto, // fallback to original report photo if no maintenance photo uploaded
+                        'tanggal_selesai' => $validated['end_date'] ? \Carbon\Carbon::parse($validated['end_date']) : now(),
+                    ]);
                 }
             }
         });
