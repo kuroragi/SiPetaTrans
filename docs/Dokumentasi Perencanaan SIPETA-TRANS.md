@@ -406,105 +406,12 @@ Sistem menggunakan hak akses berbasis peran (role-based access control) dengan r
 
 ### 5. Desain Database Sistem
 
-**Tabel users**
+Dokumentasi detail dan presisi untuk seluruh tabel dan field database SIPETA-TRANS yang dikelompokkan per modul dapat diakses pada dokumen terpisah berikut:
 
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| name | varchar | Nama pengguna |
-| email | varchar | Email pengguna |
-| password | varchar | Password terenkripsi |
-| role | varchar | Hak akses: admin, petugas, kepala_bidang, pimpinan, masyarakat |
-| created_at | timestamp | Tanggal dibuat |
+👉 **[Dokumentasi Skema Database SIPETA-TRANS (skema_database.md)](file:///d:/DATA%20UUM/Project/www/SiPetaTrans/docs/skema_database.md)**
 
-**Tabel asset_types**
+Dokumen tersebut mencakup tipe data spesifik, status *nullability*, nilai *default*, serta relasi kunci asing (*foreign key*) untuk setiap tabel per modul (RBAC, Manajemen Aset, Monitoring, Pemeliharaan, Pelaporan Kerusakan, Pengusulan Aset Baru, Trayek, dan Notifikasi).
 
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| name | varchar | Nama jenis aset |
-| icon | varchar | Ikon representasi jenis aset |
-| description | text | Keterangan jenis aset |
-| created_at | timestamp | Tanggal dibuat |
-
-**Tabel assets**
-
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| name | varchar | Nama aset |
-| asset_type_id | bigint | Relasi ke tabel asset_types |
-| status | enum | Kondisi: baik, perlu_perbaikan, rusak, dalam_pemeliharaan |
-| latitude | decimal | Koordinat latitude |
-| longitude | decimal | Koordinat longitude |
-| location | varchar | Deskripsi lokasi/kelurahan |
-| last_maintenance | date | Tanggal pemeliharaan terakhir |
-| description | text | Keterangan aset |
-| quantity | integer | Jumlah aset |
-| created_at | timestamp | Tanggal dibuat |
-
-**Tabel asset_photos**
-
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| asset_id | bigint | Relasi ke tabel assets |
-| photo_path | varchar | Path file foto |
-| photo_date | date | Tanggal pengambilan foto |
-| notes | text | Catatan kondisi pada foto |
-| created_at | timestamp | Tanggal dibuat |
-
-**Tabel maintenance**
-
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| asset_id | bigint | Relasi ke tabel assets |
-| tanggal | date | Tanggal pemeliharaan |
-| kegiatan | text | Kegiatan pemeliharaan yang dilakukan |
-| biaya | decimal | Biaya pemeliharaan |
-| hasil | text | Hasil pemeliharaan |
-| petugas_id | bigint | Relasi ke tabel users (petugas) |
-| created_at | timestamp | Tanggal dibuat |
-
-**Tabel damage_reports**
-
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| nama_pelapor | varchar | Nama pelapor |
-| kontak | varchar | Nomor kontak pelapor |
-| lokasi | text | Lokasi kerusakan |
-| asset_id | bigint | Relasi ke aset terkait (opsional) |
-| foto | varchar | File foto kerusakan |
-| keterangan | text | Keterangan kerusakan |
-| status | enum | Status: baru, dalam_proses, selesai |
-| created_at | timestamp | Tanggal laporan masuk |
-
-**Tabel proposals**
-
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| nama_pemohon | varchar | Nama pemohon |
-| kontak | varchar | Nomor kontak pemohon |
-| lokasi | text | Lokasi yang diusulkan |
-| jenis_usulan | varchar | Jenis fasilitas yang diusulkan |
-| keterangan | text | Keterangan usulan |
-| foto | varchar | File foto lokasi |
-| status | enum | Status: baru, dalam_proses, disetujui, ditolak |
-| created_at | timestamp | Tanggal usulan masuk |
-
-**Tabel notifications**
-
-| Field | Tipe | Keterangan |
-|-------|------|------------|
-| id | bigint | Primary key |
-| user_id | bigint | Relasi ke tabel users |
-| title | varchar | Judul notifikasi |
-| message | text | Isi notifikasi |
-| is_read | boolean | Status notifikasi sudah dibaca |
-| created_at | timestamp | Tanggal notifikasi dibuat |
 
 ### 6. Desain Alur Sistem
 
