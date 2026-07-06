@@ -18,7 +18,7 @@ class ProposalController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:view proposals', only: ['index', 'show']),
             new Middleware('permission:create proposals', only: ['create', 'store']),
-            new Middleware('permission:edit proposals', only: ['edit', 'updateStatus', 'markCompleted']),
+            new Middleware('permission:edit proposals', only: ['edit', 'update', 'updateStatus', 'markCompleted']),
             new Middleware('permission:delete proposals', only: ['destroy']),
         ];
     }
@@ -101,6 +101,55 @@ class ProposalController extends Controller implements HasMiddleware
                 'selesai' => Proposal::where('status', 'selesai')->count(),
             ],
         ]);
+    }
+
+    public function edit(Proposal $proposal)
+    {
+        $assetTypes = AssetType::with('subtypes')->get();
+        return view('proposals.edit', compact('proposal', 'assetTypes'));
+    }
+
+    public function update(Request $request, Proposal $proposal)
+    {
+        $validated = $request->validate([
+            'pengusul' => 'required|string|max:255',
+            'email_pengusul' => 'required|email|max:255',
+            'tanggal' => 'required|date',
+            'jenis_permintaan' => 'required|string|max:255',
+            'jumlah' => 'required|integer|min:1',
+            'lokasi' => 'required|string',
+            'coordinates' => 'nullable|json',
+            'perkiraan_anggaran' => 'nullable|integer',
+            'foto' => 'nullable|image|max:5120',
+            'arsip_surat' => 'nullable|mimes:pdf|max:2048',
+            'tindak_lanjut' => 'nullable|string',
+            'kelayakan' => 'required|in:layak,tidak layak',
+            'status' => 'required|in:ditindak lanjuti,selesai,ditolak',
+        ]);
+
+        if ($validated['kelayakan'] === 'tidak layak') {
+            $validated['status'] = 'ditolak';
+        }
+
+        if (isset($validated['coordinates'])) {
+            $validated['coordinates'] = json_decode($validated['coordinates'], true);
+        }
+
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('proposals/foto', 'public');
+        } else {
+            unset($validated['foto']);
+        }
+
+        if ($request->hasFile('arsip_surat')) {
+            $validated['arsip_surat'] = $request->file('arsip_surat')->store('proposals/surat', 'public');
+        } else {
+            unset($validated['arsip_surat']);
+        }
+        
+        $proposal->update($validated);
+
+        return redirect()->route('proposals.index')->with('success', 'Data usulan berhasil diperbarui.');
     }
 
     public function show(Proposal $proposal)

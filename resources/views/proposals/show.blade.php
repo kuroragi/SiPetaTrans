@@ -40,17 +40,18 @@
 
                 <div>
                     <p class="text-sm text-gray-600">Perkiraan Anggaran</p>
-                    <p class="font-semibold text-gray-800">Rp {{ number_format($proposal->perkiraan_anggaran, 0, ',', '.') }}</p>
+                    <p class="font-semibold text-gray-800">Rp
+                        {{ number_format($proposal->perkiraan_anggaran, 0, ',', '.') }}</p>
                 </div>
 
                 <div>
                     <p class="text-sm text-gray-600">Lokasi</p>
                     <p class="font-semibold text-gray-800">{{ $proposal->lokasi }}</p>
-                    @if($proposal->coordinates)
+                    @if ($proposal->coordinates)
                         <p class="text-xs text-gray-500">Koordinat: {{ json_encode($proposal->coordinates) }}</p>
                     @endif
                 </div>
-                
+
                 <div>
                     <p class="text-sm text-gray-600">Tindak Lanjut (Usulan)</p>
                     <p class="text-gray-800 whitespace-pre-line">{{ $proposal->tindak_lanjut ?? '-' }}</p>
@@ -58,7 +59,8 @@
 
                 <div>
                     <p class="text-sm text-gray-600 mb-2">Arsip Surat Permintaan (PDF)</p>
-                    <a href="{{ asset('storage/' . $proposal->arsip_surat) }}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition">
+                    <a href="{{ asset('storage/' . $proposal->arsip_surat) }}" target="_blank"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition">
                         <i class="fas fa-file-pdf text-red-500"></i> Lihat / Unduh Surat
                     </a>
                 </div>
@@ -66,7 +68,8 @@
                 <div>
                     <p class="text-sm text-gray-600 mb-2">Foto Dokumentasi</p>
                     <div class="bg-gray-50 border rounded-lg p-3 inline-block">
-                        <img src="{{ asset('storage/' . $proposal->foto) }}" alt="Foto Usulan" class="max-h-[400px] w-auto rounded shadow-sm" />
+                        <img src="{{ asset('storage/' . $proposal->foto) }}" alt="Foto Usulan"
+                            class="max-h-[400px] w-auto rounded shadow-sm" />
                     </div>
                 </div>
             </div>
@@ -87,15 +90,17 @@
                     </div>
                 @endif
 
-                @if($proposal->status === 'selesai')
+                @if ($proposal->status === 'selesai')
                     <div class="mb-4 p-4 rounded-lg bg-green-50 border border-green-200 text-green-800">
                         <div class="flex items-center gap-3 mb-2">
                             <i class="fas fa-check-circle text-2xl text-green-500"></i>
                             <h4 class="font-bold text-lg">Usulan Telah Diselesaikan</h4>
                         </div>
-                        <p class="text-sm">Usulan ini telah selesai ditindaklanjuti. Silakan cek data aset yang dimaksud pada menu Master Aset.</p>
+                        <p class="text-sm">Usulan ini telah selesai ditindaklanjuti. Silakan cek data aset yang dimaksud
+                            pada menu Master Aset.</p>
                         <div class="mt-4">
-                            <a href="{{ route('assets.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-sm">
+                            <a href="{{ route('assets.index') }}"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-sm">
                                 <i class="fas fa-boxes"></i> Lihat Master Aset
                             </a>
                         </div>
@@ -107,34 +112,43 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Status</label>
-                            <select name="status" class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            <select name="status"
+                                class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                                 @foreach ($statusOptions as $status)
                                     <option value="{{ $status }}" @selected(old('status', $proposal->status) === $status)>
                                         {{ ucfirst($status) }}
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="text-xs text-gray-500 mt-1">Mengubah status akan mengirim email notifikasi ke pengusul.</p>
+                            <p class="text-xs text-gray-500 mt-1">Mengubah status akan mengirim email notifikasi ke
+                                pengusul.</p>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Keterangan Admin</label>
-                            <textarea name="keterangan_admin" rows="3" class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Keterangan tambahan untuk email...">{{ old('keterangan_admin', $proposal->keterangan_admin) }}</textarea>
+                            <textarea name="keterangan_admin" rows="3"
+                                class="mt-1 w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Keterangan tambahan untuk email...">{{ old('keterangan_admin', $proposal->keterangan_admin) }}</textarea>
                         </div>
 
-                        <button type="submit" class="w-full px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+                        <button type="submit"
+                            class="w-full px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
                             Simpan Tindakan
                         </button>
                     </form>
 
                     <hr class="my-6">
-                    
-                    @if($proposal->status === 'ditindak lanjuti')
+
+                    @if ($proposal->status === 'ditindak lanjuti')
                         <div class="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800">
-                            <p class="text-sm mb-2"><i class="fas fa-info-circle mr-1"></i> Jika usulan ini telah diselesaikan (aset telah dibangun), tandai sebagai selesai untuk menambahkannya ke Master Aset.</p>
+                            <p class="text-sm mb-2"><i class="fas fa-info-circle mr-1"></i> Jika usulan ini telah
+                                diselesaikan (aset telah dibangun), tandai sebagai selesai untuk menambahkannya ke Master
+                                Aset.</p>
                             <form method="POST" action="{{ route('proposals.mark-completed', $proposal) }}">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition flex items-center justify-center gap-2" onclick="return confirm('Tandai sebagai selesai dan lanjutkan ke form tambah aset?')">
+                                <button type="submit"
+                                    class="w-full px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition flex items-center justify-center gap-2"
+                                    onclick="return confirm('Tandai sebagai selesai dan lanjutkan ke form tambah aset?')">
                                     <i class="fas fa-check-circle"></i> Selesaikan Usulan
                                 </button>
                             </form>
@@ -142,12 +156,18 @@
                     @endif
                 @endif
 
-                <div class="mt-4">
+                <div class="mt-4 flex justify-between items-center">
                     <a href="{{ route('proposals.index') }}" class="text-sm text-gray-600 hover:text-gray-800">
                         &larr; Kembali ke daftar
                     </a>
+                    @can('edit proposals')
+                    <a href="{{ route('proposals.edit', $proposal->id) }}" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition flex items-center gap-2">
+                        <i class="fas fa-edit"></i> Edit Usulan
+                    </a>
+                    @endcan
                 </div>
             </div>
+
         </div>
     </div>
 @endsection

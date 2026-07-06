@@ -18,10 +18,10 @@
             </select>
         </div>
         @can('create trayeks')
-        <a href="{{ route('trayeks.create') }}"
-            class="ml-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-            <i class="fas fa-plus"></i> Tambah Trayek
-        </a>
+            <a href="{{ route('trayeks.create') }}"
+                class="ml-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                <i class="fas fa-plus"></i> Tambah Trayek
+            </a>
         @endcan
     </div>
 
@@ -36,6 +36,7 @@
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Klasifikasi</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Warna</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Tipe Rute</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Armada Aktif</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">Aksi</th>
                 </tr>
             </thead>
