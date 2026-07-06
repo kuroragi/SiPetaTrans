@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Trayek;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Routing\Controllers\Middleware;
 
 class TrayekController extends Controller
 {
@@ -64,6 +65,9 @@ class TrayekController extends Controller
             'classification' => 'nullable|string',
             'color' => 'nullable|string',
             'route_type' => 'required|in:loop,one_way',
+            'armada_count' => 'required|integer',
+            'armada_active_count' => 'required|integer',
+            'description' => 'nullable|string',
         ]);
 
         $data = $request->all();
@@ -97,6 +101,9 @@ class TrayekController extends Controller
             'classification' => 'nullable|string',
             'color' => 'nullable|string',
             'route_type' => 'required|in:loop,one_way',
+            'armada_count' => 'required|integer',
+            'armada_active_count' => 'required|integer',
+            'description' => 'nullable|string',
         ]);
 
         $data = $request->all();

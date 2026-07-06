@@ -17,6 +17,9 @@ class Trayek extends Model
         'classification',
         'color',
         'route_type',
+        'armada_count',
+        'armada_active_count',
+        'description',
     ];
 
     protected $casts = [

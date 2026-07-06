@@ -105,6 +105,41 @@
                     </div>
                 </div>
 
+                <div class="mb-8 pb-8 border-b">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-car text-blue-600"></i> Data Armada
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="armada_count" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Jumlah Armada <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" id="armada_count" name="armada_count" value="{{ old('armada_count', $trayek->armada_count) }}"
+                                placeholder="Contoh: 10"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('armada_count') border-red-500 @enderror"
+                                required>
+                            @error('armada_count')
+                                <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="armada_active_count" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Jumlah Armada Aktif <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" id="armada_active_count" name="armada_active_count"
+                                value="{{ old('armada_active_count', $trayek->armada_active_count) }}" placeholder="Contoh: 8"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('armada_active_count') border-red-500 @enderror"
+                                required>
+                            @error('armada_active_count')
+                                <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section 2: Peta Rute -->
                 <div class="mb-8 pb-8 border-b">
                     <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
@@ -136,6 +171,25 @@
                         <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                             {{ $message }}</p>
                     @enderror
+                </div>
+
+                <div class="mb-8 pb-8 border-b">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-notes-medical text-purple-600"></i> Deskripsi Tambahan
+                    </h3>
+
+                    <div>
+                        <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Catatan/Deskripsi Trayek
+                        </label>
+                        <textarea id="description" name="description" rows="5"
+                            placeholder="Contoh: Trayek dalam kondisi baik, perlu pembersihan setiap 3 bulan, sudah ada cat anti karat..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('description') border-red-500 @enderror">{{ old('description', $trayek->description) }}</textarea>
+                        @error('description')
+                            <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->

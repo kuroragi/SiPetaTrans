@@ -54,8 +54,8 @@
                             <label for="classification" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Klasifikasi <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="classification" name="classification" value="{{ old('classification') }}"
-                                placeholder="Contoh: Utama"
+                            <input type="text" id="classification" name="classification"
+                                value="{{ old('classification') }}" placeholder="Contoh: Utama"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('classification') border-red-500 @enderror"
                                 required>
                             @error('classification')
@@ -82,8 +82,8 @@
                             <label for="distance" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Jarak Tempuh (km)
                             </label>
-                            <input type="number" id="distance" name="distance" value="{{ old('distance') }}" step="0.01"
-                                placeholder="Contoh: 5.5"
+                            <input type="number" id="distance" name="distance" value="{{ old('distance') }}"
+                                step="0.01" placeholder="Contoh: 5.5"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('distance') border-red-500 @enderror">
                             @error('distance')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
@@ -98,10 +98,47 @@
                             <select id="route_type" name="route_type"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('route_type') border-red-500 @enderror"
                                 required>
-                                <option value="loop" {{ old('route_type') == 'loop' ? 'selected' : '' }}>Loop (Awal & Akhir Bertemu)</option>
-                                <option value="one_way" {{ old('route_type') == 'one_way' ? 'selected' : '' }}>1 Way (Titik awal & akhir tidak bertemu)</option>
+                                <option value="loop" {{ old('route_type') == 'loop' ? 'selected' : '' }}>Loop (Awal &
+                                    Akhir Bertemu)</option>
+                                <option value="one_way" {{ old('route_type') == 'one_way' ? 'selected' : '' }}>1 Way (Titik
+                                    awal & akhir tidak bertemu)</option>
                             </select>
                             @error('route_type')
+                                <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-8 pb-8 border-b">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-car text-blue-600"></i> Data Armada
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="armada_count" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Jumlah Armada <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" id="armada_count" name="armada_count" value="{{ old('armada_count') }}"
+                                placeholder="Contoh: 01"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('armada_count') border-red-500 @enderror"
+                                required>
+                            @error('armada_count')
+                                <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                    {{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="armada_active_count" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nama Rute <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="armada_active_count" name="armada_active_count"
+                                value="{{ old('armada_active_count') }}" placeholder="Contoh: Aur Kuning - Pasar Bawah"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('armada_active_count') border-red-500 @enderror"
+                                required>
+                            @error('armada_active_count')
                                 <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                                     {{ $message }}</p>
                             @enderror
@@ -114,24 +151,33 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                         <i class="fas fa-map-marked-alt text-red-600"></i> Peta Rute Trayek
                     </h3>
-                    
+
                     <input type="hidden" name="coordinate" id="coordinate" value="{{ old('coordinate', '[]') }}">
-                    
+
                     <div class="mb-4 flex gap-2">
-                        <button type="button" id="undo-btn" class="px-4 py-2 rounded transition text-sm font-semibold shadow-sm" style="background-color: #f59e0b; color: #ffffff;">
+                        <button type="button" id="undo-btn"
+                            class="px-4 py-2 rounded transition text-sm font-semibold shadow-sm"
+                            style="background-color: #f59e0b; color: #ffffff;">
                             <i class="fas fa-undo"></i> Hapus Titik Terakhir
                         </button>
-                        <button type="button" id="clear-btn" class="px-4 py-2 rounded transition text-sm font-semibold shadow-sm" style="background-color: #ef4444; color: #ffffff;">
+                        <button type="button" id="clear-btn"
+                            class="px-4 py-2 rounded transition text-sm font-semibold shadow-sm"
+                            style="background-color: #ef4444; color: #ffffff;">
                             <i class="fas fa-trash"></i> Reset Rute
                         </button>
                     </div>
 
                     <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500 mb-4">
-                        <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-info-circle"></i> Panduan Menggambar Rute:</h4>
+                        <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-info-circle"></i> Panduan Menggambar
+                            Rute:</h4>
                         <ul class="list-disc list-inside text-sm text-blue-700 space-y-1">
-                            <li><strong>Tambah Titik:</strong> Klik pada peta secara berurutan untuk menggambar garis rute trayek.</li>
-                            <li><strong>Hapus Titik Terakhir:</strong> Klik tombol <span class="font-semibold text-yellow-700">Hapus Titik Terakhir</span> di atas peta untuk membatalkan titik terakhir yang baru saja diklik.</li>
-                            <li><strong>Reset Rute:</strong> Klik tombol <span class="font-semibold text-red-600">Reset Rute</span> untuk mengulangi pembuatan rute dari awal.</li>
+                            <li><strong>Tambah Titik:</strong> Klik pada peta secara berurutan untuk menggambar garis rute
+                                trayek.</li>
+                            <li><strong>Hapus Titik Terakhir:</strong> Klik tombol <span
+                                    class="font-semibold text-yellow-700">Hapus Titik Terakhir</span> di atas peta untuk
+                                membatalkan titik terakhir yang baru saja diklik.</li>
+                            <li><strong>Reset Rute:</strong> Klik tombol <span class="font-semibold text-red-600">Reset
+                                    Rute</span> untuk mengulangi pembuatan rute dari awal.</li>
                         </ul>
                     </div>
 
@@ -140,6 +186,25 @@
                         <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
                             {{ $message }}</p>
                     @enderror
+                </div>
+
+                <div class="mb-8 pb-8 border-b">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-notes-medical text-purple-600"></i> Deskripsi Tambahan
+                    </h3>
+
+                    <div>
+                        <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Catatan/Deskripsi Trayek
+                        </label>
+                        <textarea id="description" name="description" rows="5"
+                            placeholder="Contoh: Trayek dalam kondisi baik, perlu pembersihan setiap 3 bulan, sudah ada cat anti karat..."
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
+                        @error('description')
+                            <p class="text-red-500 text-sm mt-1"><i class="fas fa-exclamation-circle"></i>
+                                {{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -175,7 +240,10 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            polyline = L.polyline([], {color: '#3b82f6', weight: 4}).addTo(map);
+            polyline = L.polyline([], {
+                color: '#3b82f6',
+                weight: 4
+            }).addTo(map);
 
             // Load existing coordinates if any (from old input on validation error)
             const existingCoordsStr = document.getElementById('coordinate').value;
@@ -197,7 +265,7 @@
 
         function addPoint(lat, lng) {
             coordinates.push([lat, lng]);
-            
+
             // Add marker
             const markerOptions = {
                 radius: 4,
