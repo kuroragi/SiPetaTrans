@@ -374,14 +374,17 @@
             outline: none;
             transition: all .25s;
         }
+
         .usulan-input:focus {
             border-color: #f59e0b;
             box-shadow: 0 0 0 3px rgba(245, 158, 11, .15);
         }
+
         .usulan-input option {
             background: #ffffff;
             color: #0f172a;
         }
+
         .usulan-label {
             display: block;
             font-size: 11px;
@@ -1245,7 +1248,8 @@
 
                         {{-- overlay button to fullscreen map --}}
                         <div style="position:absolute;bottom:12px;right:12px;z-index:1000;">
-                            <a href="#peta-aset" class="btn-primary" style="padding:8px 16px;font-size:12px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border-radius:8px;">
+                            <a href="#peta-aset" class="btn-primary"
+                                style="padding:8px 16px;font-size:12px;box-shadow:0 4px 15px rgba(0,0,0,0.3);border-radius:8px;">
                                 <i class="fas fa-expand"></i> Peta Penuh & Filter
                             </a>
                         </div>
@@ -1426,7 +1430,8 @@
                             onchange="renderMapData()">
                             <option value="">Semua Trayek</option>
                             @foreach ($trayeks as $trayek)
-                                <option value="{{ $trayek->id }}">{{ $trayek->code }} - {{ $trayek->name }}</option>
+                                <option value="{{ $trayek->id }}">{{ $trayek->code }} - {{ $trayek->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -1792,7 +1797,8 @@
                             <div>
                                 <div style="font-weight:700;color:#4ade80;font-size:14px;">Usulan Berhasil Dikirim!
                                 </div>
-                                <div style="color:#94a3b8;font-size:12px;margin-top:4px;">{{ session('usulan_success') }}
+                                <div style="color:#94a3b8;font-size:12px;margin-top:4px;">
+                                    {{ session('usulan_success') }}
                                 </div>
                             </div>
                         </div>
@@ -1846,9 +1852,8 @@
                                 <div>
                                     <label class="usulan-label">Email Pengusul <span
                                             style="color:#ef4444;">*</span></label>
-                                    <input type="email" name="email_pengusul"
-                                        value="{{ old('email_pengusul') }}" placeholder="Alamat email aktif"
-                                        required class="usulan-input" />
+                                    <input type="email" name="email_pengusul" value="{{ old('email_pengusul') }}"
+                                        placeholder="Alamat email aktif" required class="usulan-input" />
                                 </div>
                             </div>
 
@@ -1856,78 +1861,118 @@
                                 <div>
                                     <label class="usulan-label">Tanggal Pengajuan <span
                                             style="color:#ef4444;">*</span></label>
-                                    <input type="date" name="tanggal"
-                                        value="{{ old('tanggal', date('Y-m-d')) }}" required
-                                        class="usulan-input" />
+                                    <input type="date" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}"
+                                        required class="usulan-input" />
                                 </div>
                                 <div>
                                     <label class="usulan-label">Jumlah <span style="color:#ef4444;">*</span></label>
-                                    <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}" min="1" required class="usulan-input" />
+                                    <input type="number" name="jumlah" value="{{ old('jumlah', 1) }}"
+                                        min="1" required class="usulan-input" />
                                 </div>
                             </div>
 
                             <div>
-                                <label class="usulan-label">Jenis Permintaan <span style="color:#ef4444;">*</span></label>
-                                <select name="jenis_permintaan_select" class="usulan-input" onchange="toggleLainnya(this)">
-                                    <option value="rambu">Rambu</option>
-                                    <option value="rubber speed bump">Rubber Speed Bump</option>
-                                    <option value="pita kejut">Pita Kejut</option>
-                                    <option value="cermin tikung">Cermin Tikung</option>
+                                <label class="usulan-label">Jenis Permintaan <span
+                                        style="color:#ef4444;">*</span></label>
+                                <select name="jenis_permintaan_select" class="usulan-input"
+                                    onchange="toggleLainnya(this)">
+                                    @foreach ($assetTypes as $assetType)
+                                        <option value="{{ $assetType->name }}">{{ $assetType->name }}</option>
+                                    @endforeach
                                     <option value="lainnya">Lainnya...</option>
                                 </select>
-                                <input type="hidden" name="jenis_permintaan" id="jenis_permintaan" value="{{ old('jenis_permintaan', 'rambu') }}" />
-                                <input type="text" id="jenis_permintaan_lainnya" class="usulan-input" placeholder="Sebutkan jenis permintaan lainnya..." style="display:none;margin-top:8px;" oninput="document.getElementById('jenis_permintaan').value = this.value;" />
+                                <input type="hidden" name="jenis_permintaan" id="jenis_permintaan"
+                                    value="{{ old('jenis_permintaan', 'rambu') }}" />
+                                <input type="text" id="jenis_permintaan_lainnya" class="usulan-input"
+                                    placeholder="Sebutkan jenis permintaan lainnya..."
+                                    style="display:none;margin-top:8px;"
+                                    oninput="document.getElementById('jenis_permintaan').value = this.value;" />
                             </div>
 
                             <div>
-                                <label class="usulan-label">Lokasi Usulan <span style="color:#ef4444;">*</span></label>
+                                <label class="usulan-label">Lokasi Usulan <span
+                                        style="color:#ef4444;">*</span></label>
                                 <div style="position:relative;">
-                                    <i class="fas fa-location-dot" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:12px;"></i>
-                                    <input type="text" name="lokasi" value="{{ old('lokasi') }}" placeholder="Nama jalan / area / titik lokasi..." required class="usulan-input" style="padding-left:32px;" />
+                                    <i class="fas fa-location-dot"
+                                        style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:12px;"></i>
+                                    <input type="text" name="lokasi" value="{{ old('lokasi') }}"
+                                        placeholder="Nama jalan / area / titik lokasi..." required
+                                        class="usulan-input" style="padding-left:32px;" />
                                 </div>
                             </div>
 
                             <div>
-                                <label class="usulan-label">Pilih Koordinat di Peta <span style="color:#64748b;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
-                                <div id="usulan-map" style="height:180px;border-radius:12px;border:1px solid #cbd5e1;overflow:hidden;z-index:1;"></div>
-                                <input type="hidden" name="coordinates[0]" id="usulan_lat" value="{{ old('coordinates.0') }}" />
-                                <input type="hidden" name="coordinates[1]" id="usulan_lng" value="{{ old('coordinates.1') }}" />
-                                <p style="font-size:11px;color:#64748b;margin-top:5px;display:flex;align-items:center;gap:5px;"><i class="fas fa-circle-info" style="color:#0ea5e9;"></i> Klik pada peta untuk menentukan titik lokasi presisi.</p>
+                                <label class="usulan-label">Pilih Koordinat di Peta <span
+                                        style="color:#64748b;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
+                                <div id="usulan-map"
+                                    style="height:180px;border-radius:12px;border:1px solid #cbd5e1;overflow:hidden;z-index:1;">
+                                </div>
+                                <input type="hidden" name="coordinates[0]" id="usulan_lat"
+                                    value="{{ old('coordinates.0') }}" />
+                                <input type="hidden" name="coordinates[1]" id="usulan_lng"
+                                    value="{{ old('coordinates.1') }}" />
+                                <p
+                                    style="font-size:11px;color:#64748b;margin-top:5px;display:flex;align-items:center;gap:5px;">
+                                    <i class="fas fa-circle-info" style="color:#0ea5e9;"></i> Klik pada peta untuk
+                                    menentukan titik lokasi presisi.
+                                </p>
                             </div>
 
                             <div>
-                                <label class="field-label">Perkiraan Anggaran <span style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
+                                <label class="field-label">Perkiraan Anggaran <span
+                                        style="color:#94a3b8;font-weight:400;text-transform:none;letter-spacing:0;">(opsional)</span></label>
                                 <div style="position:relative;">
-                                    <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#475569;font-size:12px;font-weight:600;">Rp</span>
-                                    <input type="number" name="perkiraan_anggaran" value="{{ old('perkiraan_anggaran') }}" placeholder="Contoh: 1500000" class="field-input" style="padding-left:36px;" />
+                                    <span
+                                        style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#475569;font-size:12px;font-weight:600;">Rp</span>
+                                    <input type="number" name="perkiraan_anggaran"
+                                        value="{{ old('perkiraan_anggaran') }}" placeholder="Contoh: 1500000"
+                                        class="field-input" style="padding-left:36px;" />
                                 </div>
                             </div>
 
                             <div>
-                                <label class="field-label">Arsip Surat Permohonan (PDF) <span style="color:#f87171;">*</span></label>
-                                <div id="pdf-upload-zone" class="upload-zone" onclick="document.getElementById('arsip-input').click()">
-                                    <i id="pdf-upload-icon" class="fas fa-file-pdf" style="color:#334155;font-size:28px;margin-bottom:8px;display:block;"></i>
-                                    <p id="pdf-upload-text" style="font-size:13px;font-weight:600;color:#64748b;">Klik untuk upload surat PDF</p>
-                                    <p id="pdf-upload-hint" style="font-size:11px;color:#334155;margin-top:4px;">PDF &mdash; maksimal 2 MB</p>
+                                <label class="field-label">Arsip Surat Permohonan (PDF) <span
+                                        style="color:#f87171;">*</span></label>
+                                <div id="pdf-upload-zone" class="upload-zone"
+                                    onclick="document.getElementById('arsip-input').click()">
+                                    <i id="pdf-upload-icon" class="fas fa-file-pdf"
+                                        style="color:#334155;font-size:28px;margin-bottom:8px;display:block;"></i>
+                                    <p id="pdf-upload-text" style="font-size:13px;font-weight:600;color:#64748b;">Klik
+                                        untuk upload surat PDF</p>
+                                    <p id="pdf-upload-hint" style="font-size:11px;color:#334155;margin-top:4px;">PDF
+                                        &mdash; maksimal 2 MB</p>
                                 </div>
-                                <input id="arsip-input" type="file" name="arsip_surat" accept=".pdf" required style="display:none;" onchange="handlePdfChange(this)" />
+                                <input id="arsip-input" type="file" name="arsip_surat" accept=".pdf" required
+                                    style="display:none;" onchange="handlePdfChange(this)" />
                             </div>
 
                             <div>
-                                <label class="field-label">Foto Dokumentasi Lokasi <span style="color:#f87171;">*</span></label>
-                                <div id="usulan-upload-zone" class="upload-zone" onclick="document.getElementById('usulan-foto-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleUsulanDrop(event)">
-                                    <i id="usulan-upload-icon" class="fas fa-cloud-arrow-up" style="color:#334155;font-size:32px;margin-bottom:8px;display:block;"></i>
-                                    <p id="usulan-upload-text" style="font-size:13px;font-weight:600;color:#64748b;">Klik atau drag &amp; drop foto di sini</p>
-                                    <p id="usulan-upload-hint" style="font-size:11px;color:#334155;margin-top:4px;">JPG, PNG &mdash; maksimal 5 MB</p>
+                                <label class="field-label">Foto Dokumentasi Lokasi <span
+                                        style="color:#f87171;">*</span></label>
+                                <div id="usulan-upload-zone" class="upload-zone"
+                                    onclick="document.getElementById('usulan-foto-input').click()"
+                                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                                    ondragleave="this.classList.remove('drag-over')" ondrop="handleUsulanDrop(event)">
+                                    <i id="usulan-upload-icon" class="fas fa-cloud-arrow-up"
+                                        style="color:#334155;font-size:32px;margin-bottom:8px;display:block;"></i>
+                                    <p id="usulan-upload-text" style="font-size:13px;font-weight:600;color:#64748b;">
+                                        Klik atau drag &amp; drop foto di sini</p>
+                                    <p id="usulan-upload-hint" style="font-size:11px;color:#334155;margin-top:4px;">
+                                        JPG, PNG &mdash; maksimal 5 MB</p>
                                 </div>
-                                <input id="usulan-foto-input" type="file" name="foto" accept="image/*" required style="display:none;" onchange="handleUsulanFileChange(this)" />
+                                <input id="usulan-foto-input" type="file" name="foto" accept="image/*"
+                                    required style="display:none;" onchange="handleUsulanFileChange(this)" />
                                 <div id="usulan-img-preview" style="display:none;margin-top:10px;position:relative;">
-                                    <img id="usulan-preview-img" src="" alt="preview" style="width:100%;border-radius:12px;object-fit:cover;max-height:160px;" />
-                                    <button type="button" onclick="clearUsulanFile()" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(239,68,68,.85);color:#fff;font-size:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="fas fa-times"></i></button>
+                                    <img id="usulan-preview-img" src="" alt="preview"
+                                        style="width:100%;border-radius:12px;object-fit:cover;max-height:160px;" />
+                                    <button type="button" onclick="clearUsulanFile()"
+                                        style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(239,68,68,.85);color:#fff;font-size:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i
+                                            class="fas fa-times"></i></button>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:13px 24px;font-size:14px;background:linear-gradient(135deg,#d97706,#f59e0b);box-shadow:0 0 20px rgba(245,158,11,.3);">
+                            <button type="submit" class="btn-primary"
+                                style="width:100%;justify-content:center;padding:13px 24px;font-size:14px;background:linear-gradient(135deg,#d97706,#f59e0b);box-shadow:0 0 20px rgba(245,158,11,.3);">
                                 <i class="fas fa-paper-plane"></i> Kirim Usulan Sekarang
                             </button>
 
@@ -2170,7 +2215,8 @@
 
             <div class="footer-copyright-bar"
                 style="border-top:1px solid rgba(255,255,255,.04);padding-top:20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;">
-                <span class="copyright-text" style="color:#1e293b;font-size:11px;">© {{ date('Y') }} SIPETA-TRANS
+                <span class="copyright-text" style="color:#1e293b;font-size:11px;">© {{ date('Y') }}
+                    SIPETA-TRANS
                     — Dinas Perhubungan Kota Bukittinggi. Hak cipta dilindungi.</span>
                 <div class="copyright-text"
                     style="display:flex;align-items:center;gap:6px;font-size:11px;color:#1e293b;">
@@ -2313,10 +2359,18 @@
                 if (!a.coordinates) return;
                 let mk;
                 if (a.geometry === 'polygon') {
-                    mk = L.polygon(a.coordinates, { color: a.color || '#3b82f6', weight: 2, fillColor: a.color || '#3b82f6', fillOpacity: 0.4 });
+                    mk = L.polygon(a.coordinates, {
+                        color: a.color || '#3b82f6',
+                        weight: 2,
+                        fillColor: a.color || '#3b82f6',
+                        fillOpacity: 0.4
+                    });
                     a.coordinates.forEach(c => pts.push(c));
                 } else if (a.geometry === 'polyline') {
-                    mk = L.polyline(a.coordinates, { color: a.color || '#3b82f6', weight: 3 });
+                    mk = L.polyline(a.coordinates, {
+                        color: a.color || '#3b82f6',
+                        weight: 3
+                    });
                     a.coordinates.forEach(c => pts.push(c));
                 } else {
                     let lat = a.coordinates[0];
@@ -2327,7 +2381,7 @@
                     });
                     pts.push([lat, lng]);
                 }
-                
+
                 mk.bindPopup(makePopup(a), {
                     className: 'custom-popup',
                     maxWidth: 280
@@ -2336,7 +2390,7 @@
             });
 
             hmap.addLayer(cluster);
-            
+
             // Draw all trayek lines in hero map
             trayekData.forEach((trayek, index) => {
                 if (!trayek.coordinate || !Array.isArray(trayek.coordinate)) return;
@@ -2352,7 +2406,9 @@
                     <div style="font-family:'Segoe UI',sans-serif;font-size:13px;font-weight:700;">
                         ${trayek.name}
                     </div>
-                `, {className: 'custom-popup'});
+                `, {
+                    className: 'custom-popup'
+                });
                 polyline.addTo(hmap);
                 trayek.coordinate.forEach(coord => pts.push(coord));
             });
@@ -2381,9 +2437,17 @@
                 if (!a.coordinates) return;
                 let mk;
                 if (a.geometry === 'polygon') {
-                    mk = L.polygon(a.coordinates, { color: a.color || '#3b82f6', weight: 3, fillColor: a.color || '#3b82f6', fillOpacity: 0.4 });
+                    mk = L.polygon(a.coordinates, {
+                        color: a.color || '#3b82f6',
+                        weight: 3,
+                        fillColor: a.color || '#3b82f6',
+                        fillOpacity: 0.4
+                    });
                 } else if (a.geometry === 'polyline') {
-                    mk = L.polyline(a.coordinates, { color: a.color || '#3b82f6', weight: 4 });
+                    mk = L.polyline(a.coordinates, {
+                        color: a.color || '#3b82f6',
+                        weight: 4
+                    });
                 } else {
                     let lat = a.coordinates[0];
                     let lng = a.coordinates[1];
@@ -2417,7 +2481,7 @@
 
         // Generate dynamic distinct color from index
         function getTrayekColor(index) {
-            const hue = (index * 137.508) % 360; 
+            const hue = (index * 137.508) % 360;
             return `hsl(${hue}, 80%, 55%)`;
         }
 
@@ -2425,7 +2489,7 @@
             mainCluster.clearLayers();
             trayekLayers.forEach(layer => mainMap.removeLayer(layer));
             trayekLayers = [];
-            
+
             if (mapMode === 'aset') {
                 filterMarkers();
             } else if (mapMode === 'trayek') {
@@ -2441,7 +2505,7 @@
             trayekData.forEach((trayek, index) => {
                 if (selectedTrayekId && trayek.id.toString() !== selectedTrayekId) return;
                 if (!trayek.coordinate || !Array.isArray(trayek.coordinate)) return;
-                
+
                 const color = getTrayekColor(index);
                 const polyline = L.polyline(trayek.coordinate, {
                     color: color,
@@ -2450,7 +2514,7 @@
                     dashArray: '10, 10',
                     lineJoin: 'round'
                 });
-                
+
                 polyline.bindPopup(`
                     <div style="min-width:200px;font-family:'Segoe UI',sans-serif;">
                         <div style="font-weight:800;font-size:14px;color:#fff;background:${color};padding:8px 12px;border-radius:6px;margin-bottom:8px;">
@@ -2472,14 +2536,16 @@
 
             document.getElementById('visible-count').textContent = n;
             if (pts.length > 0) {
-                mainMap.fitBounds(pts, { padding: [40, 40] });
+                mainMap.fitBounds(pts, {
+                    padding: [40, 40]
+                });
             }
         }
 
         function filterMarkers() {
             const status = document.getElementById('filter-status').value;
             const type = document.getElementById('filter-type').value;
-            
+
             let n = 0;
             const pts = [];
 
@@ -2490,19 +2556,21 @@
                 if (ok) {
                     mainCluster.addLayer(mk);
                     if (a.geometry === 'polygon' || a.geometry === 'polyline') {
-                        if(Array.isArray(a.coordinates)) a.coordinates.forEach(c => pts.push(c));
+                        if (Array.isArray(a.coordinates)) a.coordinates.forEach(c => pts.push(c));
                     } else if (Array.isArray(a.coordinates) && a.coordinates.length >= 2) {
                         pts.push([a.coordinates[0], a.coordinates[1]]);
                     }
                     n++;
                 }
             });
-            
+
             mainMap.addLayer(mainCluster);
             document.getElementById('visible-count').textContent = n;
-            
+
             if (pts.length > 0) {
-                mainMap.fitBounds(pts, { padding: [40, 40] });
+                mainMap.fitBounds(pts, {
+                    padding: [40, 40]
+                });
             }
         }
 
@@ -2511,7 +2579,7 @@
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
-            
+
             // Map mode reset
             const modeEl = document.getElementById('filter-mode');
             if (modeEl) {
@@ -2579,7 +2647,7 @@
         function initUsulanMap() {
             const mapEl = document.getElementById('usulan-map');
             if (!mapEl) return;
-            
+
             let usulanMap = L.map('usulan-map').setView([-0.305, 100.369], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
@@ -2591,10 +2659,10 @@
             usulanMap.on('click', function(e) {
                 const lat = e.latlng.lat;
                 const lng = e.latlng.lng;
-                
+
                 document.getElementById('usulan_lat').value = lat;
                 document.getElementById('usulan_lng').value = lng;
-                
+
                 if (usulanMarker) {
                     usulanMarker.setLatLng(e.latlng);
                 } else {

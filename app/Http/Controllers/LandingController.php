@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\AssetType;
 use App\Models\Trayek;
 
 class LandingController extends Controller
 {
     public function index()
     {
+        $assetTypes = AssetType::all();
         $assets = Asset::with('type')->where('is_active', true)->get();
         $trayeks = Trayek::all();
 
@@ -29,6 +31,7 @@ class LandingController extends Controller
             ->values();
 
         return view('public.landing', [
+            'assetTypes' => $assetTypes,
             'assets' => $assets,
             'assetData' => $assetData,
             'trayeks' => $trayeks,
